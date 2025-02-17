@@ -148,7 +148,6 @@ void * __init cmucal_get_sfr_node(unsigned int id)
 
 	return node;
 }
-EXPORT_SYMBOL_GPL(cmucal_get_sfr_node);
 
 unsigned int cmucal_get_id(char *name)
 {

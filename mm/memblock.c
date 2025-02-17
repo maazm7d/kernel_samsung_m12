@@ -1825,7 +1825,7 @@ void __init __memblock_free_early(phys_addr_t base, phys_addr_t size)
  * down, but we are still initializing the system.  Pages are released directly
  * to the buddy allocator, no bootmem metadata is updated because it is gone.
  */
-void __init __memblock_free_late(phys_addr_t base, phys_addr_t size)
+void __memblock_free_late(phys_addr_t base, phys_addr_t size)
 {
 	phys_addr_t cursor, end;
 
