@@ -71,9 +71,7 @@ static void alloc_string(const char *str, int size)
 
 static void warn_ignored_character(char chr)
 {
-	fprintf(stderr,
-	        "%s:%d:warning: ignoring unsupported character '%c'\n",
-	        current_file->name, yylineno, chr);
+/* Do nothing */
 }
 %}
 
