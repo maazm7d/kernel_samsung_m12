@@ -180,4 +180,4 @@ else
 	fi
 fi
 
-echo "$res"
+echo "-Project-Xed-KernelSU-Next"
