@@ -1,0 +1,1 @@
+cmd_drivers/staging/rtl8188eus/built-in.a :=  rm -f drivers/staging/rtl8188eus/built-in.a; /home/maazm7d/toolchains/androidcc-4.9/bin/aarch64-linux-android-ar rcSTPD drivers/staging/rtl8188eus/built-in.a 
