@@ -1369,7 +1369,6 @@ struct task_struct {
 	 */
 #ifdef CONFIG_KSU_SUSFS
 	u64 susfs_task_state;
- 	u64 susfs_last_fake_mnt_id;
 #endif
 	randomized_struct_fields_end
 
