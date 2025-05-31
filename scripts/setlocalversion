@@ -180,4 +180,4 @@ else
 	fi
 fi
 
-echo "-Project-Xed-KernelSU-Next"
+echo "-Project-Xed-KernelSU-Next+SUSFS"
