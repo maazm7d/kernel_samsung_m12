@@ -1,0 +1,285 @@
+/*
+ * SAMSUNG EXYNOS850 board common device tree source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/ {
+	fragment@common {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			gpio_keys {
+				status = "okay";
+				compatible = "gpio-keys";
+				pinctrl-names = "default";
+				pinctrl-0 = <&key_voldown &key_volup>;
+
+				button@1 {
+					label = "gpio-keys: KEY_VOLUMEDOWN";
+					linux,code = <114>;
+					gpios = <&gpa1 0 0xf>;
+				};
+				button@2 {
+					label = "gpio-keys: KEY_VOLUMEUP";
+					linux,code = <115>;
+					gpios = <&gpa0 7 0xf>;
+				};
+			};
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
+
+&pinctrl_0 {
+	key_voldown: key-voldown {
+		samsung,pins = "gpa1-0";
+		samsung,pin-function = <0xf>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	key_volup: key-volup {
+		samsung,pins = "gpa0-7";
+		samsung,pin-function = <0xf>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+};
+
+&usi_00_cmgp {
+		usi_v2_mode = "spi";
+		status = "okay";
+};
+
+&pinctrl_0 {
+	intr_on: intr-on {
+		samsung,pins = "gpa0-0";
+		samsung,pin-function = <0xf>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	intr_off: intr-off {
+		samsung,pins = "gpa0-0";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+	};
+
+	tsp_rst_on: tsp-rst-on {
+		samsung,pins = "gpa3-0";
+		samsung,pin-function = <1>;
+		samsung,pin-val	= <1>;
+		samsung,pin-pud = <0>;
+	};
+
+	tsp_rst_off: tsp-rst-off {
+		samsung,pins = "gpa3-0";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+	};
+
+};
+&pinctrl_5 {
+	tsp_id_on: tsp-id-on {
+		samsung,pins = "gpg1-7", "gpg2-0";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <0>;
+	};
+	tsp_id_off: tsp-id-off {
+		samsung,pins = "gpg1-7", "gpg2-0";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+	};
+};
+
+&pinctrl_0 {
+	tsp_id3_on: tsp-id3-on {
+		samsung,pins = "gpa0-2";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <0>;
+	};
+	tsp_id3_off: tsp-id3-off {
+		samsung,pins = "gpa0-2";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+	};
+};
+
+&spi_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "ok";
+	pinctrl-names = "on_state", "off_state";
+	pinctrl-0 = <&spi1_bus &spi1_cs>;
+	pinctrl-1 = <&spi1_sleep>;
+	num-cs = <3>;
+
+	ilitek_ili9882x@0 {
+		status = "okay";
+		compatible = "iliteck,ili9882x-spi";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+		pinctrl-names = "default", "pins_on_state", "pins_off_state";
+		pinctrl-0 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-1 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-2 = <&tsp_id_off &tsp_id3_off &intr_off &spi1_sleep &tsp_rst_off>;
+		iliteck,irq-gpio = <&gpa0 0 0x2008>; /* IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+		iliteck,reset-gpio = <&gpa3 0 0x0>;
+		iliteck,cs-gpio = <&gpm3 0 0>;
+		iliteck,lcdid1-gpio = <&gpg1 7 0x0>;
+		iliteck,lcdid2-gpio = <&gpg2 0 0x0>;
+		iliteck,lcdid3-gpio = <&gpa0 2 0x0>;
+		iliteck,lcd_rst = "gpio_lcd_rst";
+		iliteck,lcd_bl_en = "gpio_lcd_bl_en";
+		iliteck,lcd_vddi = "vdd_ldo28";
+		iliteck,irq-on-state = <0>;
+		iliteck,spi-mode = <0>;
+		iliteck,byte-delay-us = <0>;
+		iliteck,block-delay-us = <0>;
+		iliteck,ubl-max-freq = <5000000>;
+		iliteck,ubl-byte-delay-us = <20>;
+		iliteck,area-size = <48 81 30>;
+		iliteck,enable_settings_aot;
+		iliteck,enable_sysinput_enabled;
+		iliteck,support_ear_detect_mode;
+		iliteck,prox_lp_scan_enabled;
+		iliteck,lcd_rst_delay = <2>;
+		iliteck,lcdid = <3 7>;	// LTPS BOE
+		iliteck,lcdtype = <0 0 0 0xba7254 0 0 0 0x3a6250>;
+		iliteck,fw_name = "", "", "", "tsp_ilitek/ili7807s_a12s.hex", "", "", "", "tsp_ilitek/ili9882_a12s.hex";
+		controller-data {
+//			cs-gpio = <&gpm3 0 0>;
+			samsung,spi-feedback-delay = <0>;
+		};
+	};
+
+	/* Novatek device tree node */
+	novatek@1 {
+		status = "okay";
+		compatible = "novatek,NVT-ts-spi";
+		reg = <1>; //Same as CS ID
+		spi-max-frequency = <9600000>;
+		novatek,reset-gpio = <&gpa3 0 0x00>;
+		novatek,irq-gpio = <&gpa0 0 0x2002>;
+		novatek,cs-gpio = <&gpm3 0 0>;
+		pinctrl-names = "default", "on_state", "off_state";
+		pinctrl-0 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-1 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-2 = <&tsp_id_off &tsp_id3_off &intr_off &spi1_sleep &tsp_rst_off>;
+		novatek,lcdid1-gpio = <&gpg1 7 0x0>;
+		novatek,lcdid2-gpio = <&gpg2 0 0x0>;
+		novatek,lcdid3-gpio = <&gpa0 2 0x0>;
+		novatek,resolution = <720 1600>;
+		novatek,enable_settings_aot;
+		novatek,support_ear_detect_mode;
+		novatek,prox_lp_scan_enabled;
+		novatek,enable_sysinput_enabled;
+		novatek,lcdid = <1 2 6>;	// CSOT DTC SHARP
+		novatek,lcdtype = <0 0x0aa240 0x0a1240 0 0 0 0x0af240>;
+		novatek,fw_name = "", "tsp_novatek/nt36525_a12s_csot.bin", "tsp_novatek/nt36525_a12s_dtc.bin", "", "", "", "tsp_novatek/nt36525_a12s_sharp.bin";
+		novatek,fw_name_mp = "", "tsp_novatek/nt36525_a12s_mp_csot.bin", "tsp_novatek/nt36525_a12s_mp_dtc.bin", "", "", "", "tsp_novatek/nt36525_a12s_mp_sharp.bin";
+		novatek,regulator_lcd_vdd = "vdd_ldo28";
+		novatek,regulator_lcd_reset = "gpio_lcd_rst";
+		novatek,regulator_lcd_bl = "gpio_lcd_bl_en";
+
+		/* 525 */
+		//novatek,swrst-n8-addr = <0x01F01A>;
+
+		/* 672A, 525B, 675, 526, 672C */
+		novatek,swrst-n8-addr = <0x03F0FE>;
+		novatek,spi-rd-fast-addr = <0x03F310>;
+
+		/* MP */
+		novatek,mp-support-dt;
+
+		/* nt36525_a12s_csot */
+		novatek-mp-criteria-722E@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "novatek-mp-criteria-722E";
+
+			/* sec cmd test config */
+			open_test_spec = <(-511) 5120>;
+			short_test_spec = <10000 14008>;
+			diff_test_frame = <50>;
+			fdm_x_num = <2>;
+		};
+
+		/* nt36525_a12s_dtc */
+		novatek-mp-criteria-7232@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "novatek-mp-criteria-7232";
+
+			/* sec cmd test config */
+			open_test_spec = <(-511) 5120>;
+			short_test_spec = <10000 14008>;
+			diff_test_frame = <50>;
+			fdm_x_num = <2>;
+		};
+
+		/* nt36525_a12s_sharp */
+		novatek-mp-criteria-7231@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "novatek-mp-criteria-7231";
+
+			/* sec cmd test config */
+			open_test_spec = <(-511) 5120>;
+			short_test_spec = <10000 14008>;
+			diff_test_frame = <50>;
+			fdm_x_num = <2>;
+		};
+
+		controller-data {
+//			cs-gpio = <&gpm3 0 0>;
+			samsung,spi-feedback-delay = <0>;
+		};
+	};
+
+	synaptics_tcm@2 {
+		status = "okay";
+		compatible = "synaptics,tcm-spi";
+		reg = <2>;
+		spi-max-frequency = <7000000>;
+		pinctrl-names = "default", "on_state", "off_state";
+		pinctrl-0 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-1 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-2 = <&tsp_id_off &tsp_id3_off &intr_off &spi1_sleep &tsp_rst_off>;
+		synaptics,irq-gpio = <&gpa0 0 0x2008>; /* IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+		synaptics,irq-on-state = <0>;
+		synaptics,cs-gpio = <&gpm3 0 0>;
+		synaptics,spi-mode = <3>;
+		synaptics,byte-delay-us = <0>;
+		synaptics,block-delay-us = <0>;
+		synaptics,ubl-max-freq = <7000000>;
+		synaptics,ubl-byte-delay-us = <20>;
+		synaptics,area-size = <48 81 30>;
+		synaptics,regulator_lcd_vdd = "vdd_ldo28";
+		synaptics,regulator_lcd_bl = "gpio_lcd_bl_en";
+		synaptics,regulator_lcd_reset = "gpio_lcd_rst";
+		synaptics,lcdid1-gpio = <&gpg1 7 0x0>;
+		synaptics,lcdid2-gpio = <&gpg2 0 0x0>;
+		synaptics,lcdid3-gpio = <&gpa0 2 0x0>;
+		synaptics,enable_settings_aot;
+		synaptics,support_ear_detect_mode;
+		synaptics,prox_lp_scan_enabled;
+		synaptics,lcdid = <0 4 5>;	// BOE-TD4375, BOE-TD4150, BOE-TD4160
+		synaptics,lcdtype = <0x7A6220 0 0 0 0x3A6220 0xBA6220>;
+		synaptics,fw_name = "tsp_synaptics/td4375_a12s_boe.bin", "", "", "", "tsp_synaptics/td4150_a12s_boe.bin", "tsp_synaptics/td4160_a12s_boe.bin";
+
+		controller-data {
+//			cs-gpio = <&gpm3 0 0>;
+			samsung,spi-feedback-delay = <0>;
+		};
+	};
+
+	
+};

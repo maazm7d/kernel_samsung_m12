@@ -1,0 +1,849 @@
+/*
+ * SAMSUNG EXYNOS SoC EMS device tree source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * SAMSUNG EXYNOS SoC EMS device nodes are listed in this file.
+ * EXYNOS based board files should include this file.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ */
+
+/ {
+	ems {
+		/* Load Balance Trigger */
+		#define DEFAULT_RATIO	80
+		lbt {
+			pre-overutilized-cpus = "0-3";
+
+			overutil-level0 {
+				cpus =	"0-3",
+					"4-7";
+				ratio =	<25>,
+					<25>;
+			};
+			overutil-level1 {
+				cpus = "0-7";
+				ratio = <DEFAULT_RATIO>;
+			};
+		};
+
+		/* FRT Migration */
+		frt {
+			coregroup0 {
+				coverage-ratio = <30>;
+				active-ratio = <25>;
+			};
+			coregroup1 {
+				coverage-ratio = <30>;
+				active-ratio = <25>;
+			};
+		};
+
+		part {
+			coregroup0 {
+				active-ratio-limit = <43>;
+				active-ratio-boost = <42>;
+			};
+			coregroup1 {
+				active-ratio-limit = <43>;
+				active-ratio-boost = <42>;
+			};
+		};
+
+                emstune {
+			mode-map {
+				mode0 {
+					desc = "normal";
+					boost_level = <2>;
+
+					level0 {
+						set = <&set0>;
+					};
+					level1 {
+						set = <&set1>;
+					};
+					level2 {
+						set = <&set2>;
+					};
+				};
+				mode1 {
+					desc = "screen-off";
+					boost_level = <2>;
+
+					level0 {
+						set = <&set3>;
+					};
+					level1 {
+						set = <&set4>;
+					};
+					level2 {
+						set = <&set5>;
+					};
+				};
+				mode2 {
+					desc = "camera";
+					boost_level = <2>;
+
+					level0 {
+						set = <&set6>;
+					};
+					level1 {
+						set = <&set7>;
+					};
+					level2 {
+						set = <&set8>;
+					};
+				};
+			};
+
+			set0: set@0000 {
+				idx = <0>;
+				desc = "normal default";
+
+				prefer_idle {   /* root fg bg ta rt */
+					enabled  = <  0  0  0  0  0  >;
+				};
+
+				/* weight (%) applied to active cpu's efficiency */
+				weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <100 100 100 100  50  50  50  50>;
+					foreground      = <100 100 100 100  50  50  50  50>;
+					background      = <100 100 100 100  50  50  50  50>;
+					top-app         = <100 100 100 100  50  50  50  50>;
+					rt              = <100 100 100 100  50  50  50  50>;
+				};
+
+				/* weight (%) applied to idle core's efficiency */
+				idle_weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <200 200 200 200  100 100 100 100>;
+					foreground      = <200 200 200 200  100 100 100 100>;
+					background      = <200 200 200 200  100 100 100 100>;
+					top-app         = <200 200 200 200  100 100 100 100>;
+					rt              = <200 200 200 200  100 100 100 100>;
+				};
+
+				/* Boosting margin applied to frequency selection */
+				freq_boost {       /* cpu    0  1  2  3  4  5  6  7 */
+					root            = <  0  0  0  0  0  0  0  0 >;
+					foreground      = <  0  0  0  0  0  0  0  0 >;
+					background      = <  0  0  0  0  0  0  0  0 >;
+					top-app         = <  5  5  5  5  5  5  5  5 >;
+					rt              = <  0  0  0  0  0  0  0  0 >;
+                                };
+
+				/* cpus allowed applied to core selection */
+				cpus_allowed {
+					target-sched-class = <EMS_SCHED_FAIR>;
+
+					root            = "0-7";
+					foreground      = "0-7";
+					background      = "0-7";
+					top-app         = "0-7";
+					rt              = "0-7";
+				};
+
+				/* gov-data used by CPUFreq governor */
+				esg {			/* LIT0 LIT1 */
+					step            = <   4    4 >;
+				};
+
+				/* Ontime Migration */
+				ontime {	/* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+
+					dom_list_u {
+						domain0 {
+							cpus = "0-3";
+							lower-boundary = <0>;
+							upper-boundary = <430>;
+						};
+						domain1 {
+							cpus = "4-7";
+							lower-boundary = <133>;
+							upper-boundary = <1024>;
+						};
+					};
+					dom_list_s {
+						domain0 {
+							cpus = "0-3";
+							lower-boundary = <0>;
+							upper-boundary = <243>;
+						};
+						domain1 {
+							cpus = "4-7";
+							lower-boundary = <81>;
+							upper-boundary = <1024>;
+						};
+					};
+				};
+
+				util_est {	/* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+				};
+
+				prio_pinning {  /* root fg bg ta rt */
+					enabled	 = <  0  0  0  0  0  >;
+
+					mask = "6-7";
+					prio = <110>;
+				};
+
+				init_util {     /* root fg bg ta rt */
+					ratio  = <    5 25  5 25  5  >;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25  100 >;
+				};
+
+				ecs {
+					enabled = <0>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+						mode1 {
+							cpus = "0-3";
+							enabled = <1>;
+							mode = <SAVING>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <430>;
+							domain-nr-running-thr = <16>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <430>;
+							domain-nr-running-thr = <16>;
+						};
+					};
+				};
+			};
+
+			set1: set@0001 {
+				idx = <1>;
+				desc = "normal boost";
+
+				/* weight (%) applied to active cpu's efficiency */
+				weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <100 100 100 100  50  50  50  50>;
+					foreground      = <100 100 100 100  50  50  50  50>;
+					background      = <100 100 100 100  50  50  50  50>;
+					top-app         = <100 100 100 100  50  50  50  50>;
+					rt              = <100 100 100 100  50  50  50  50>;
+				};
+
+				/* weight (%) applied to idle core's efficiency */
+				idle_weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <200 200 200 200 100 100 100 100>;
+					foreground      = <200 200 200 200 100 100 100 100>;
+					background      = <200 200 200 200 100 100 100 100>;
+					top-app         = <200 200 200 200 100 100 100 100>;
+					rt              = <200 200 200 200 100 100 100 100>;
+				};
+
+				/* Boosting margin applied to frequency selection */
+				freq_boost {       /* cpu    0  1  2  3  4  5  6  7 */
+					root            = <  0  0  0  0  0  0  0  0 >;
+					foreground      = <  0  0  0  0  0  0  0  0 >;
+					background      = <  0  0  0  0  0  0  0  0 >;
+					top-app         = < 20 20 20 20 20 20 20 20 >;
+					rt              = <  0  0  0  0  0  0  0  0 >;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25   25 >;
+				};
+
+				ecs {
+					enabled = <1>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+					};
+				};
+			};
+
+			set2: set@0002 {
+				idx = <2>;
+				desc = "normal app launching";
+
+				prefer_idle {   /* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25    5 >;
+				};
+
+				ecs {
+					enabled = <1>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+					};
+				};
+			};
+
+			set3: set@0003 {
+				idx = <3>;
+				desc = "screen-off default";
+
+				prefer_idle {   /* root fg bg ta rt */
+					enabled  = <  0  0  0  0  0  >;
+				};
+
+				/* weight (%) applied to active cpu's efficiency */
+				weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <100 100 100 100  50  50  50  50>;
+					foreground      = <100 100 100 100  50  50  50  50>;
+					background      = <100 100 100 100  50  50  50  50>;
+					top-app         = <100 100 100 100  50  50  50  50>;
+					rt              = <100 100 100 100  50  50  50  50>;
+				};
+
+				/* weight (%) applied to idle core's efficiency */
+				idle_weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <200 200 200 200  100 100 100 100>;
+					foreground      = <200 200 200 200  100 100 100 100>;
+					background      = <200 200 200 200  100 100 100 100>;
+					top-app         = <200 200 200 200  100 100 100 100>;
+					rt              = <200 200 200 200  100 100 100 100>;
+                                };
+
+                                /* Boosting margin applied to frequency selection */
+				freq_boost {       /* cpu    0  1  2  3  4  5  6  7 */
+					root            = <  0  0  0  0  0  0  0  0 >;
+					foreground      = <  0  0  0  0  0  0  0  0 >;
+					background      = <  0  0  0  0  0  0  0  0 >;
+					top-app         = <  0  0  0  0  0  0  0  0 >;
+					rt              = <  0  0  0  0  0  0  0  0 >;
+                                };
+
+				/* cpus allowed applied to core selection */
+				cpus_allowed {
+					target-sched-class = <EMS_SCHED_FAIR>;
+
+					root            = "0-7";
+					foreground      = "0-7";
+					background      = "0-7";
+					top-app         = "0-7";
+					rt              = "0-7";
+				};
+
+				/* gov-data used by CPUFreq governor */
+				esg {			/* LIT0 LIT1 */
+					step            = <   8    8 >;
+				};
+
+				/* Ontime Migration */
+				ontime {	/* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+
+					dom_list_u {
+						domain0 {
+							cpus = "0-3";
+							lower-boundary = <0>;
+							upper-boundary = <430>;
+						};
+						domain1 {
+							cpus = "4-7";
+							lower-boundary = <133>;
+							upper-boundary = <1024>;
+						};
+					};
+					dom_list_s {
+						domain0 {
+							cpus = "0-3";
+							lower-boundary = <0>;
+							upper-boundary = <243>;
+						};
+						domain1 {
+							cpus = "4-7";
+							lower-boundary = <81>;
+							upper-boundary = <1024>;
+						};
+					};
+				};
+
+				util_est {	/* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+				};
+
+				prio_pinning {  /* root fg bg ta rt */
+					enabled	 = <  0  0  0  0  0  >;
+
+					mask = "6-7";
+					prio = <110>;
+				};
+
+				init_util {     /* root fg bg ta rt */
+					ratio  = <    5 25  5 25  5  >;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25  100 >;
+				};
+
+				ecs {
+					enabled = <1>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+						mode1 {
+							cpus = "0-3";
+							enabled = <1>;
+							mode = <SAVING>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <530>;
+							domain-nr-running-thr = <16>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <530>;
+							domain-nr-running-thr = <16>;
+						};
+					};
+				};
+			};
+
+			set4: set@0004{
+				idx = <4>;
+				desc = "screen-off boost";
+
+				/* weight (%) applied to active cpu's efficiency */
+				weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <100 100 100 100  50  50  50  50>;
+					foreground      = <100 100 100 100  50  50  50  50>;
+					background      = <100 100 100 100  50  50  50  50>;
+					top-app         = <100 100 100 100  50  50  50  50>;
+					rt              = <100 100 100 100  50  50  50  50>;
+				};
+
+				/* weight (%) applied to idle core's efficiency */
+				idle_weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <200 200 200 200 100 100 100 100>;
+					foreground      = <200 200 200 200 100 100 100 100>;
+					background      = <200 200 200 200 100 100 100 100>;
+					top-app         = <200 200 200 200 100 100 100 100>;
+					rt              = <200 200 200 200 100 100 100 100>;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25   25 >;
+				};
+
+				ecs {
+					enabled = <1>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+					};
+				};
+			};
+
+			set5: set@0005 {
+				idx = <5>;
+				desc = "screen-off app launching";
+
+				prefer_idle {   /* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25    5 >;
+				};
+
+				ecs {
+					enabled = <1>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+					};
+				};
+			};
+
+			set6: set@0006 {
+				idx = <0>;
+				desc = "camera default";
+
+				prefer_idle {   /* root fg bg ta rt */
+					enabled  = <  0  0  0  0  0  >;
+				};
+
+				/* weight (%) applied to active cpu's efficiency */
+				weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <100 100 100 100 100 100 100 100>;
+					foreground      = <100 100 100 100 100 100 100 100>;
+					background      = <100 100 100 100 100 100 100 100>;
+					top-app         = <100 100 100 100 100 100 100 100>;
+					rt              = <100 100 100 100 100 100 100 100>;
+				};
+
+				/* weight (%) applied to idle core's efficiency */
+				idle_weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <200 200 200 200 200 200 200 200>;
+					foreground      = <200 200 200 200 200 200 200 200>;
+					background      = <200 200 200 200 200 200 200 200>;
+					top-app         = <200 200 200 200 200 200 200 200>;
+					rt              = <200 200 200 200 200 200 200 200>;
+				};
+
+				/* Boosting margin applied to frequency selection */
+				freq_boost {       /* cpu    0  1  2  3  4  5  6  7 */
+					root            = <  0  0  0  0  0  0  0  0 >;
+					foreground      = <  0  0  0  0  0  0  0  0 >;
+					background      = <  0  0  0  0  0  0  0  0 >;
+					top-app         = <  5  5  5  5  5  5  5  5 >;
+					rt              = <  0  0  0  0  0  0  0  0 >;
+                                };
+
+				/* cpus allowed applied to core selection */
+				cpus_allowed {
+					target-sched-class = <EMS_SCHED_FAIR>;
+
+					root            = "0-7";
+					foreground      = "0-7";
+					background      = "0-7";
+					top-app         = "0-7";
+					rt              = "0-7";
+				};
+
+				/* gov-data used by CPUFreq governor */
+				esg {			/* LIT0 LIT1 */
+					step            = <  16   16 >;
+				};
+
+				/* Ontime Migration */
+				ontime {	/* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+
+					dom_list_u {
+						domain0 {
+							cpus = "0-3";
+							lower-boundary = <0>;
+							upper-boundary = <430>;
+						};
+						domain1 {
+							cpus = "4-7";
+							lower-boundary = <133>;
+							upper-boundary = <1024>;
+						};
+					};
+					dom_list_s {
+						domain0 {
+							cpus = "0-3";
+							lower-boundary = <0>;
+							upper-boundary = <243>;
+						};
+						domain1 {
+							cpus = "4-7";
+							lower-boundary = <81>;
+							upper-boundary = <1024>;
+						};
+					};
+				};
+
+				util_est {	/* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+				};
+
+				prio_pinning {  /* root fg bg ta rt */
+					enabled	 = <  0  0  0  0  0  >;
+
+					mask = "6-7";
+					prio = <110>;
+				};
+
+				init_util {     /* root fg bg ta rt */
+					ratio  = <    5 25  5 25  5  >;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25  100 >;
+				};
+
+				ecs {
+					enabled = <0>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+						mode1 {
+							cpus = "0-3";
+							enabled = <1>;
+							mode = <SAVING>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <430>;
+							domain-nr-running-thr = <16>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <430>;
+							domain-nr-running-thr = <16>;
+						};
+					};
+				};
+			};
+
+			set7: set@0007 {
+				idx = <1>;
+				desc = "camera boost";
+
+				/* weight (%) applied to active cpu's efficiency */
+				weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <100 100 100 100 100 100 100 100>;
+					foreground      = <100 100 100 100 100 100 100 100>;
+					background      = <100 100 100 100 100 100 100 100>;
+					top-app         = <100 100 100 100 100 100 100 100>;
+					rt              = <100 100 100 100 100 100 100 100>;
+				};
+
+				/* weight (%) applied to idle core's efficiency */
+				idle_weight {	   /* cpu    0   1   2   3   4   5   6   7 */
+					root            = <200 200 200 200 200 200 200 200>;
+					foreground      = <200 200 200 200 200 200 200 200>;
+					background      = <200 200 200 200 200 200 200 200>;
+					top-app         = <200 200 200 200 200 200 200 200>;
+					rt              = <200 200 200 200 200 200 200 200>;
+				};
+
+				/* Boosting margin applied to frequency selection */
+				freq_boost {       /* cpu    0  1  2  3  4  5  6  7 */
+					root            = <  0  0  0  0  0  0  0  0 >;
+					foreground      = <  0  0  0  0  0  0  0  0 >;
+					background      = <  0  0  0  0  0  0  0  0 >;
+					top-app         = < 20 20 20 20 20 20 20 20 >;
+					rt              = <  0  0  0  0  0  0  0  0 >;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25   25 >;
+				};
+
+				ecs {
+					enabled = <1>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+					};
+				};
+			};
+
+			set8: set@0008 {
+				idx = <2>;
+				desc = "camera app launching";
+
+				prefer_idle {   /* root fg bg ta rt */
+					enabled  = <  0  1  0  1  0  >;
+				};
+
+				frt {                   /* LIT0 LIT1 */
+					coverage_ratio =  <  30   30 >;
+					active_ratio =    <  25    5 >;
+				};
+
+				ecs {
+					enabled = <1>;
+
+					modes {
+						mode0 {
+							cpus = "0-7";
+							enabled = <1>;
+							mode = <NORMAL>;
+						};
+					};
+
+					domains {
+						domain0 {
+							cpus = "0-3";
+							role = <TRIGGER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+						domain1 {
+							cpus = "4-7";
+							role = <TRIGGER_AND_SAVER>;
+							domain-util-avg-thr = <0>;
+							domain-nr-running-thr = <1024>;
+						};
+					};
+				};
+			};
+		};
+
+		ecs {
+			enabled = <1>;
+
+			ecs-modes {
+				ecs-mode-0 {
+					mode-name = "NO SPARING";
+					cpus = "0-7";
+					enabled = <1>;
+					mode = <NORMAL>;
+				};
+				ecs-mode-1 {
+					mode-name = "SPARING NON_BOOT";
+					cpus = "0-3";
+					enabled = <1>;
+					mode = <SAVING>;
+				};
+			};
+
+			ecs-domains {
+				ecs-domain-0 {
+					domain-name = "BOOT";
+					cpus = "0-3";
+					role = <TRIGGER>;
+					domain-util-avg-thr = <430>;
+					domain-nr-running-thr = <6>;
+				};
+				ecs-domain-1 {
+					domain-name = "NON-BOOT";
+					cpus = "4-7";
+					role = <TRIGGER_AND_SAVER>;
+					domain-util-avg-thr = <430>;
+					domain-nr-running-thr = <6>;
+				};
+			};
+		};
+	};
+};

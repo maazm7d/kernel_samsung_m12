@@ -1,0 +1,181 @@
+/*
+ * SAMSUNG EXYNOS850 board device tree source
+ *
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+//#include "exynos3830-erd3830-cp-s318ap-sit.dtsi"
+#include "../exynos_gpio_config_macros.dtsi"
+#include "exynos850-m12_common.dtsi"
+#include "camera_m12_00-exynos3830.dtsi"
+#include "exynos850-m12_sensor_grip_00.dtsi"
+
+&panel_0 {
+    /* reset, power */
+    gpios = <&gpg2 4 0x1>;
+};
+
+&udc {
+	status = "okay";
+};
+
+&pinctrl_0 {
+	tsp_id3_on: tsp-id3-on {
+		samsung,pins = "gpa0-2";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <0>;
+	};
+	tsp_id3_off: tsp-id3-off {
+		samsung,pins = "gpa0-2";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+	};
+};
+
+&spi_1 {
+	ilitek_ili9882x@0 {
+		pinctrl-names = "default", "pins_on_state", "pins_off_state";
+		pinctrl-0 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-1 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-2 = <&tsp_id_off &tsp_id3_off &intr_off &spi1_sleep &tsp_rst_off>;
+		iliteck,lcdid1-gpio = <&gpg1 7 0x0>;
+		iliteck,lcdid2-gpio = <&gpg2 0 0x0>;
+		iliteck,lcdid3-gpio = <&gpa0 2 0x0>;
+		iliteck,lcdid = <0 4>;
+		iliteck,lcdtype = <0x0a7250 0 0 0 0xaa7250>;
+		iliteck,fw_name = "tsp_ilitek/ili9881x_m12s.hex", "", "", "", "tsp_ilitek/ili7806s_m12s.hex";
+	};
+
+	/* Novatek device tree node */
+	novatek@1 {
+		pinctrl-names = "default", "on_state", "off_state";
+		pinctrl-0 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-1 = <&tsp_id_on &tsp_id3_on &intr_on &spi1_bus &spi1_cs &tsp_rst_on>;
+		pinctrl-2 = <&tsp_id_off &tsp_id3_off &intr_off &spi1_sleep &tsp_rst_off>;
+		novatek,lcdid1-gpio = <&gpg1 7 0x0>;
+		novatek,lcdid2-gpio = <&gpg2 0 0x0>;
+		novatek,lcdid3-gpio = <&gpa0 2 0x0>;
+		novatek,lcdid = <1 2 5>;	// CSOT, DTC, LTPS
+		novatek,resume_lp_delay = <0 15 15 0 0 32>;	// CSOT, DTC, LTPS
+		novatek,lcdtype = <0 0x0aa240 0x0a1240 0 0 0x1aF240>;
+		novatek,fw_name = "", "tsp_novatek/nt36525_m12s_csot.bin", "tsp_novatek/nt36525_m12s_dtc.bin", "", "", "tsp_novatek/nt36675_m12s_ltps.bin";
+		novatek,fw_name_mp = "", "tsp_novatek/nt36525_m12s_mp_csot.bin", "tsp_novatek/nt36525_m12s_mp_dtc.bin", "", "", "tsp_novatek/nt36675_m12s_mp_ltps.bin";
+
+		/* nt36675_m12s_ltps */
+		novatek-mp-criteria-721D@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "novatek-mp-criteria-721D";
+
+			/* sec cmd test config */
+			open_test_spec = <(-511) 5120>;
+			short_test_spec = <10000 14008>;
+			diff_test_frame = <50>;
+			fdm_x_num = <2>;
+		};
+	};
+};
+
+/* ----------------------------------------------------------------------------
+ * Configurations for GPIOs without Device Driver
+ * Note: Do NOT add pins using by device drivers to the configuration below
+ * ----------------------------------------------------------------------------
+ */
+/*
+ * pin banks of exynos980 pin-controller 0 (ALIVE) : pinctrl@11850000
+ * GPA0, GPA1, GPA2, GPA3, GPA4
+ * GPQ0
+ * NOTE: GPA, GPQ and GPM are in ALIVE region. DO NOT add SLEEP gpio config.
+ */
+/*
+&pinctrl_0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial0>;
+	initial0: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 1 (CMGP) : pinctrl@11C30000
+ * GPM0 ~ GPM7
+ * NOTE: GPA, GPQ and GPM are in ALIVE region. DO NOT add SLEEP gpio config.
+ */
+/*
+&pinctrl_1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial1>;
+	initial1: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 2 (AUD) : pinctrl@14A60000
+ * GPB0, GPB1
+ */
+/*
+&pinctrl_2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial2>;
+	initial2: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 3 (HSI) : pinctrl@13430000
+ * GPF2
+ */
+/*
+&pinctrl_3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial3>;
+	initial3: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 4 (CORE) : pinctrl@12070000
+ * GPF0, GPF1
+ */
+/*
+&pinctrl_4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial4>;
+	initial4: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 5 (PERI) : pinctrl@139B0000
+ * GPP0, GPP1, GPP2
+ * GPG0, GPG1, GPG2, GPG3
+ * GPC0, GPC1
+ */
+&pinctrl_5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial5>;
+	initial5: initial-state {
+#ifndef CONFIG_SEC_FACTORY
+		PIN_IN_SLP(gpg0-1, NONE, INPUT, NONE);		/* SUB_DET */
+#endif
+		PIN_SLP(gpp0-0, INPUT, NONE);		/* FG/IF_PMIC_SDA_1P8 */
+		PIN_SLP(gpp0-1, INPUT, NONE);		/* FG/IF_PMIC_SCL_1P8 */
+	};
+};
+
+/* add cable_det_lb_mb */
+#if 0
+&cpif {
+	pinctrl-0 = <&rffe1_clk &rffe1_data>, <&b12_13_sel>,
+	<&drx_mlb_sel &drx_lna_en_b7>, <&cable_det_lb_mb>;
+};
+#endif

@@ -1,0 +1,140 @@
+/* Copyright (c) 2013, Samsung Electronics Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&pinctrl_0 {
+	nfc_clk_req: nfc_clk_req {
+		samsung,pins = "gpa3-4";
+		/* PULL DOWN for S3NRN4V, S3NSN4V */
+		samsung,pin-pud = <1>;
+	 };
+
+	nfc_clk_req_nc: nfc_clk_req_nc {
+		samsung,pins = "gpa3-4";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+	 };
+
+	xclkout: xclkout {
+		samsung,pins = "gpq0-2";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <0>;
+	};
+
+	xclkout_nc: xclkout_nc {
+		samsung,pins = "gpq0-2";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+	};
+};
+
+&pinctrl_5 {
+	nfc_firm: nfc_firm {
+		samsung,pins = "gpg1-2";
+		samsung,pin-function = <1>;
+		samsung,pin-pud = <0>;
+		samsung,pin-val = <0>;
+		samsung,pin-con-pdn = <3>;
+		samsung,pin-pud-pdn = <0>;
+	};
+
+	nfc_en: nfc_en {
+		samsung,pins = "gpg1-0";
+		samsung,pin-function = <1>;
+		samsung,pin-pud = <0>;
+		samsung,pin-val = <1>;
+		samsung,pin-con-pdn = <3>;
+		samsung,pin-pud-pdn = <0>;
+	};
+
+	nfc_pwr_en: nfc_pwr_en {
+		samsung,pins = "gpg1-3";
+		samsung,pin-function = <1>;
+		samsung,pin-pud = <0>;
+		samsung,pin-val = <0>;
+		samsung,pin-con-pdn = <3>;
+		samsung,pin-pud-pdn = <0>;
+	};
+
+	nfc_check: nfc-check {
+		samsung,pins = "gpg1-4";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <0>;
+		samsung,pin-pud-pdn = <0>;
+	};
+
+	nfc_firm_nc: nfc_firm_nc {
+		samsung,pins = "gpg1-2";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+		samsung,pin-con-pdn = <2>;
+		samsung,pin-pud-pdn = <1>;
+	};
+
+	nfc_en_nc: nfc_en_nc {
+		samsung,pins = "gpg1-0";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+		samsung,pin-con-pdn = <2>;
+		samsung,pin-pud-pdn = <1>;
+	};
+
+	nfc_pwr_en_nc: nfc_pwr_en_nc {
+		samsung,pins = "gpg1-3";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <1>;
+		samsung,pin-con-pdn = <2>;
+		samsung,pin-pud-pdn = <1>;
+	};
+
+	i2c2_nfc_bus: i2c2-nfc-bus {
+		samsung,pins = "gpp0-4", "gpp0-5";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+		samsung,pin-con-pdn = <2>;
+		samsung,pin-pud-pdn = <0>;
+	};
+};
+
+&i2c_2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	clock-frequency = <400000>;
+	samsung,reset-before-trans;
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c2_nfc_bus>;
+
+	sec-nfc@27 {
+		compatible = "sec-nfc";
+		reg = <0x27>;
+
+		interrupts = <3 0 0>;
+		interrupt-parent = <&gpa1>;
+
+		sec-nfc,ven-gpio = <&gpg1 0 0>;
+		sec-nfc,firm-gpio = <&gpg1 2 0>;
+		sec-nfc,irq-gpio = <&gpa1 3 0>;
+		sec-nfc,check_nfc = <&gpg1 4 0>;
+		sec-nfc,clk_req-gpio = <&gpa3 4 0>;
+		sec-nfc,pvdd_en = <&gpg1 3 0>;
+
+		clocks = <&clock OSC_NFC>;
+		clock-names = "oscclk_nfc";
+		sec-nfc,nfc_ap_clk;
+
+		pinctrl-names = "default", "nfc_nc";
+		pinctrl-0 = <&nfc_en &nfc_firm &nfc_pwr_en &xclkout &nfc_clk_req &nfc_check>;
+		pinctrl-1 = <&nfc_en_nc &nfc_firm_nc &nfc_pwr_en_nc &nfc_clk_req_nc &xclkout_nc>;		
+	};
+};

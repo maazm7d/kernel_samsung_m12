@@ -1,0 +1,116 @@
+/*
+ * SAMSUNG EXYNOS850 board device tree source
+ *
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+//#include "exynos3830-erd3830-cp-s318ap-sit.dtsi"
+#include "../exynos_gpio_config_macros.dtsi"
+#include "exynos850-a12s_common.dtsi"
+#include "camera_a12s_00-exynos3830.dtsi"
+#include "exynos850-a12s_sensor_grip_00.dtsi"
+
+&panel_0 {
+    /* reset, power */
+    gpios = <&gpg2 4 0x1>;
+};
+
+&udc {
+	status = "okay";
+};
+
+/* ----------------------------------------------------------------------------
+ * Configurations for GPIOs without Device Driver
+ * Note: Do NOT add pins using by device drivers to the configuration below
+ * ----------------------------------------------------------------------------
+ */
+/*
+ * pin banks of exynos980 pin-controller 0 (ALIVE) : pinctrl@11850000
+ * GPA0, GPA1, GPA2, GPA3, GPA4
+ * GPQ0
+ * NOTE: GPA, GPQ and GPM are in ALIVE region. DO NOT add SLEEP gpio config.
+ */
+/*
+&pinctrl_0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial0>;
+	initial0: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 1 (CMGP) : pinctrl@11C30000
+ * GPM0 ~ GPM7
+ * NOTE: GPA, GPQ and GPM are in ALIVE region. DO NOT add SLEEP gpio config.
+ */
+/*
+&pinctrl_1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial1>;
+	initial1: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 2 (AUD) : pinctrl@14A60000
+ * GPB0, GPB1
+ */
+/*
+&pinctrl_2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial2>;
+	initial2: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 3 (HSI) : pinctrl@13430000
+ * GPF2
+ */
+/*
+&pinctrl_3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial3>;
+	initial3: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 4 (CORE) : pinctrl@12070000
+ * GPF0, GPF1
+ */
+/*
+&pinctrl_4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial4>;
+	initial4: initial-state {
+	};
+};
+*/
+
+/*
+ * pin banks of exynos980 pin-controller 5 (PERI) : pinctrl@139B0000
+ * GPP0, GPP1, GPP2
+ * GPG0, GPG1, GPG2, GPG3
+ * GPC0, GPC1
+ */
+&pinctrl_5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&initial5>;
+	initial5: initial-state {
+#ifndef CONFIG_SEC_FACTORY
+		PIN_IN_SLP(gpg0-1, NONE, INPUT, NONE);		/* SUB_DET */
+#endif
+		PIN_SLP(gpp0-0, INPUT, NONE);		/* FG/IF_PMIC_SDA_1P8 */
+		PIN_SLP(gpp0-1, INPUT, NONE);		/* FG/IF_PMIC_SCL_1P8 */
+	};
+};

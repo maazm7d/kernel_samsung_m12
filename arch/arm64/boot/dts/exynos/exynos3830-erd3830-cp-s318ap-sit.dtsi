@@ -1,0 +1,468 @@
+/*
+ * Samsung CP interface device tree source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *             http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include <dt-bindings/soc/samsung/exynos-cpif.h>
+#include <dt-bindings/interrupt-controller/exynos3830.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	fragment@modemif {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			/* Modem interface information */
+			cpif {
+				compatible = "samsung,exynos-cp";
+				status = "okay";
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&sub_ant_hb_ctl_0 &sub_ant_hb_ctl_1>,
+					<&tdd_trx_sw1>,
+					<&tx_b13_14_20_sw &b21_lan_en>,
+					<&drx_hb_lna_en1 &drx_hb_lna_en2>,
+					<&drx_mb_lna_en1 &drx_mb_lna_en2 &drx_mb_lna_en3 &drx_mb_lna_en4>,
+					<&prx_tr_b28_29_71_sw &prx_tr_b21_34_sw>,
+					<&drx_mlb3_lna_en1 &drx_mlb3_lna_en2 &drx_mlb3_lna_en3>;
+
+				interrupt-parent = <&gic>;
+				interrupts = <GIC_SPI INTREQ_RESET_REQ IRQ_TYPE_LEVEL_HIGH>;
+				interrupt-names = "RESET_REQ";
+
+				ap2cp_cfg_addr = <0x14020000>;
+
+				/* */
+				mif,name = "s318ap";
+				mif,cp_num = <0>;
+				mif,modem_type = <SEC_S5000AP>;
+				mif,protocol = <PROTOCOL_SIT>;
+				mif,ipc_version = <SIPC_VER_50>;
+				mif,link_type = <LINKDEV_SHMEM>;
+				mif,link_name = "shmem";
+				mif,link_attrs = <(LINK_ATTR_MASK_XMIT_BTDLR | LINK_ATTR_MASK_DUMP_ALIGNED | LINK_ATTR_MASK_BOOT_ALIGNED | LINK_ATTR_MASK_MEM_DUMP | LINK_ATTR_MASK_MEM_BOOT | LINK_ATTR_MASK_DPRAM_MAGIC)>;
+				mif,interrupt_types = <INTERRUPT_MAILBOX>;
+
+				/* Mailbox interrupt number from AP to CP */
+				mif,int_ap2cp_msg = <0>;
+				mif,int_ap2cp_wakeup = <1>;
+				mif,int_ap2cp_status = <2>;
+				mif,int_ap2cp_active = <3>;
+				mif,int_ap2cp_lcd_status = <4>;
+				mif,int_ap2cp_uart_noti = <15>;
+
+				/* Mailbox interrupt number from CP to AP */
+				mif,irq_cp2ap_msg = <0>;
+				mif,irq_cp2ap_status = <2>;
+				mif,irq_cp2ap_active = <3>;
+				mif,irq_cp2ap_wakelock = <8>;
+				mif,irq_cp2ap_ratmode = <9>;
+
+				/* Legacy Buffers (FMT, RAW) */
+				legacy_fmt_head_tail_offset = <0x8>;
+				legacy_fmt_buffer_offset = <0x1000>;
+				legacy_fmt_txq_size = <0x1000>;
+				legacy_fmt_rxq_size = <0x1000>;
+				legacy_raw_head_tail_offset = <0x18>;
+				legacy_raw_buffer_offset = <0x3000>;
+				legacy_raw_txq_size = <0x1FD000>;
+				legacy_raw_rxq_size = <0x200000>;
+
+				/*
+				 * Control messages containing two elements
+				 * <MAILBOX_SR [shared register number]>
+				 * <DRAM_V1   [offset from ipc base]>
+				 * <DRAM_V2   [cmsg start offset from ipc base]>
+				 */
+				ap2cp_msg = <MAILBOX_SR 0>;
+				cp2ap_msg = <MAILBOX_SR 1>;
+				ap2cp_united_status = <MAILBOX_SR 2>;
+				cp2ap_united_status = <MAILBOX_SR 3>;
+				ap2cp_kerneltime = <MAILBOX_SR 9>;
+
+				/* srinfo settings */
+				srinfo_offset = <0x800>;
+				srinfo_size = <SRINFO_SIZE>;
+
+				/* clk_table offset */
+				clk_table_offset = <0x28>;
+
+				/* Status bit info for mbx_ap2cp_united_status */
+				sbi_lcd_status_mask = <0x1>;
+				sbi_lcd_status_pos = <27>;
+				sbi_crash_type_mask = <0xf>;
+				sbi_crash_type_pos = <23>;
+				sbi_ext_backtrace_mask = <0x1>;
+				sbi_ext_backtrace_pos = <17>;
+				sbi_uart_noti_mask = <0x1>;
+				sbi_uart_noti_pos = <16>;
+				sbi_ds_det_mask = <0x3>;
+				sbi_ds_det_pos = <14>;
+				sbi_sys_rev_mask = <0xff>;
+				sbi_sys_rev_pos = <6>;
+				sbi_pda_active_mask = <0x1>;
+				sbi_pda_active_pos = <5>;
+				sbi_ap_status_mask = <0xf>;
+				sbi_ap_status_pos = <1>;
+
+				/* Status bit info for mbx_cp2ap_united_status */
+				sbi_cp_rat_mode_mask = <0x3f>;
+				sbi_cp_rat_mode_pos = <26>;
+				sbi_cp2ap_wakelock_mask = <0x1>;
+				sbi_cp2ap_wakelock_pos = <6>;
+				sbi_lte_active_mask = <0x1>;
+				sbi_lte_active_pos = <5>;
+				sbi_cp_status_mask = <0xf>;
+				sbi_cp_status_pos = <1>;
+				sbi_ap2cp_kerneltime_sec_mask = <0xfff>;
+				sbi_ap2cp_kerneltime_sec_pos = <20>;
+				sbi_ap2cp_kerneltime_usec_mask = <0xfffff>;
+				sbi_ap2cp_kerneltime_usec_pos = <0>;
+
+				/* IO devices */
+				mif,num_iodevs = <23>;
+				iodevs {
+					io_device_0 {
+						iod,name = "umts_ipc0";
+						iod,ch = <245>;
+						iod,format = <0>;		/* IPC_FMT */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_1 {
+						iod,name = "umts_ipc1";
+						iod,ch = <246>;
+						iod,format = <0>;		/* IPC_FMT */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_2 {
+						iod,name = "umts_rfs0";
+						iod,ch = <41>;
+						iod,format = <1>;		/* IPC_RAW?? */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_3 {
+						iod,name = "umts_router";
+						iod,ch = <21>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_4 {
+						iod,name = "umts_dm0";
+						iod,ch = <81>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_5 {
+						iod,name = "umts_loopback";
+						iod,ch = <82>;
+						iod,format = <1>;		/* IPC_FMT */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_6 {
+						iod,name = "rmnet0";
+						iod,ch = <1>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_7 {
+						iod,name = "rmnet1";
+						iod,ch = <2>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_8 {
+						iod,name = "rmnet2";
+						iod,ch = <3>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_9 {
+						iod,name = "rmnet3";
+						iod,ch = <4>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_10 {
+						iod,name = "rmnet4";
+						iod,ch = <5>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_11 {
+						iod,name = "rmnet5";
+						iod,ch = <6>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_12 {
+						iod,name = "rmnet6";
+						iod,ch = <7>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_13 {
+						iod,name = "rmnet7";
+						iod,ch = <8>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_14 {
+						iod,name = "multipdp";
+						iod,ch = <0>;
+						iod,format = <3>;		/* IPC_MULTI_RAW */
+						iod,io_type = <IODEV_DUMMY>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_15 {
+						iod,name = "umts_boot0";
+						iod,ch = <241>;
+						iod,format = <4>;		/* IPC_BOOT */
+						iod,io_type = <IODEV_BOOTDUMP>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x200>;		/* ATTR_NO_CHECK_MAXQ*/
+					};
+					io_device_16 {
+						iod,name = "umts_rcs0";
+						iod,ch = <91>;
+						iod,format = <0>;		/* IPC_FMT */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_17 {
+						iod,name = "umts_rcs1";
+						iod,ch = <92>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_18 {
+						iod,name = "umts_wfc0";
+						iod,ch = <93>;
+						iod,format = <0>;		/* IPC_FMT */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_19 {
+						iod,name = "umts_wfc1";
+						iod,ch = <94>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_20 {
+						iod,name = "umts_embms0";
+						iod,ch = <30>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_21 {
+						iod,name = "umts_embms1";
+						iod,ch = <31>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_NET>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+					io_device_22 {
+						iod,name = "umts_atc0";
+						iod,ch = <23>;
+						iod,format = <1>;		/* IPC_RAW */
+						iod,io_type = <IODEV_IPC>;
+						iod,link_type = <LINKDEV_SHMEM>;
+						iod,attrs = <0x0>;
+					};
+				}; /* end of iodevs */
+			}; /* end of cpif */
+
+			/* Mailbox information */
+			cp_mailbox {
+				compatible = "samsung,exynos-cp-mailbox";
+
+				reg = <0x0 0x11920000 0x180>;
+
+				interrupt-parent = <&gic>;
+				interrupts = <GIC_SPI INTREQ__MAILBOX_CP2AP IRQ_TYPE_LEVEL_HIGH>;
+
+				mcu,name = "cp_mailbox";
+				mcu,id = <0>;
+				mcu,irq_affinity_mask = <0>;
+			};
+
+			/* Shared memory information*/
+			cp_shmem {
+				compatible = "samsung,exynos-cp-shmem";
+
+				cp_num = <0>;
+				use_mem_map_on_cp = <1>;
+
+				regions {
+					cp {
+						region,name = "CP";
+						region,index = <SHMEM_CP>;
+						region,rmem = <0>;
+						region,offset = <0x00000000>;
+						region,size = <0x07900000>;
+						region,cached = <0>;
+					};
+					vss {
+						region,name = "VSS";
+						region,index = <SHMEM_VSS>;
+						region,rmem = <0>;
+						region,offset = <0x07900000>;
+						region,size = <0x00700000>;
+						region,cached = <0>;
+					};
+					ipc {
+						region,name = "IPC";
+						region,index = <SHMEM_IPC>;
+						region,rmem = <0>;
+						region,offset = <0x08000000>;
+						region,size = <0x00800000>;
+						region,cached = <0>;
+					};
+				};
+			}; /* end of cp_shmem */
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
+
+&pinctrl_0 {
+	sub_ant_hb_ctl_0: sub_ant_hb_ctl_0 {
+		samsung,pins = "gpa1-4";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	sub_ant_hb_ctl_1: sub_ant_hb_ctl_1 {
+		samsung,pins = "gpa1-5";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	tdd_trx_sw1: tdd_trx_sw1 {
+		samsung,pins = "gpa1-6";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	tx_b13_14_20_sw: tx_b13_14_20_sw {
+		samsung,pins = "gpa1-7";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	b21_lan_en: b21_lan_en {
+		samsung,pins = "gpa2-0";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_hb_lna_en1: drx_hb_lna_en1 {
+		samsung,pins = "gpa2-1";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_hb_lna_en2: drx_hb_lna_en2 {
+		samsung,pins = "gpa2-2";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_mb_lna_en1: drx_mb_lna_en1 {
+		samsung,pins = "gpa2-3";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_mb_lna_en2: drx_mb_lna_en2 {
+		samsung,pins = "gpa2-4";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_mb_lna_en3: drx_mb_lna_en3 {
+		samsung,pins = "gpa2-5";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	prx_tr_b28_29_71_sw: prx_tr_b28_29_71_sw {
+		samsung,pins = "gpa2-6";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_mb_lna_en4: drx_mb_lna_en4 {
+		samsung,pins = "gpa2-7";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	prx_tr_b21_34_sw: prx_tr_b21_34_sw {
+		samsung,pins = "gpa3-0";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_mlb3_lna_en1: drx_mlb3_lna_en1 {
+		samsung,pins = "gpa3-1";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_mlb3_lna_en2: drx_mlb3_lna_en2 {
+		samsung,pins = "gpa3-2";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+
+	drx_mlb3_lna_en3: drx_mlb3_lna_en3 {
+		samsung,pins = "gpa3-3";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+	};
+};

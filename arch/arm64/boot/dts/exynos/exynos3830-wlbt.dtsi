@@ -1,0 +1,61 @@
+/ {
+	i3c_apm_pmic: syscon@11A50000 {
+		compatible = "i3c_apm_pmic", "syscon";
+		reg = <0x0 0x11A50000 0x1800>;
+	};
+
+	dbus_baaw: syscon@14C20000 {			// PMU_DBUS_BAAW
+		compatible = "dbus_baaw", "syscon";
+		reg = <0x0 0x14C20000 0x300>;
+	};
+
+	pbus_baaw: syscon@14C30000 {			// PMU_CBUS_BAAW
+		compatible = "pbus_baaw", "syscon";
+		reg = <0x0 0x14C30000 0x300>;
+	};
+
+	wlbt_remap_base: syscon@14C50000 {		// PMU_REMAP
+		compatible = "wlbt_remap", "syscon";
+		reg = <0x0 0x14C50000 0x500>;     // TODO: what size? (>0x400)
+	};
+
+	boot_cfg: syscon@14C60000 {
+		compatible = "boot_cfg", "syscon";
+		reg = <0x0 0x14C60000 0x1200>;
+	};
+
+	/* MAILBOX_AP2WLBT */
+	scsc_wifibt: scsc_wifibt@119C0000 {
+		compatible = "samsung,scsc_wifibt";
+		/* Mailbox Registers */
+		reg = <0x0 0x119C0000 0x180>;
+		/* Exynos 3830 UM External GIC IRQ table */
+		//SPI[54] 86	BLK_ALIVE	INTREQ__MAILBOX_WLBT2AP
+		//SPI[38] 70	BLK_ALIVE	INTREQ__ALIVE_WLBT_ACTIVE
+		//SPI[230] 262	BLK_WLBT	WB2AP_CFG_REQ
+		//SPI[231] 263	BLK_WLBT	WB2AP_WDOG_RESET_REQ_IRQ
+		interrupts = <0 54 4>, <0 38 4>, <0 230 4>, <0 231 4>;
+		interrupt-names = "MBOX","ALIVE","CFG_REQ","WDOG";
+		/* PMU alive handle */
+		samsung,syscon-phandle = <&pmu_system_controller>;
+		samsung,i3c_apm_pmic-syscon-phandle = <&i3c_apm_pmic>;
+		samsung,dbus_baaw-syscon-phandle = <&dbus_baaw>;
+		samsung,pbus_baaw-syscon-phandle = <&pbus_baaw>;
+		samsung,wlbt_remap-syscon-phandle = <&wlbt_remap_base>;
+		samsung,boot_cfg-syscon-phandle = <&boot_cfg>;
+		/* MIF / INT / CL0 / CL1 */
+		/* this qos_table should be per-platform. Leave it here until we have multiple platfrom support */
+		//qos_table = <
+		//	 419000 100000 403000  936000  /* SCSC_QOS_MIN */
+		//	1014000 533000 910000  1664000 /* SCSC_QOS_MED */
+		//	2093000 667000 1742000 2314000 /* SCSC_QOS_MAX */
+		//	    >;
+	};
+
+	scsc_bt_qos {
+		compatible = "samsung,scsc_bt_qos";
+		bluetooth_qos = <1600000  421000 133000  507000
+		                      10  666000 400000 1150000
+		                      20 1000000 533000 2210000>;
+	};
+};

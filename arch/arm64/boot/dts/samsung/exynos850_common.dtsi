@@ -1,0 +1,74 @@
+/*
+ * SAMSUNG EXYNOS850 board common device tree source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include <dt-bindings/clock/exynos3830.h>
+#include "../exynos/exynos3830-universal3830-cp-s318ap-sipc.dtsi"
+#include "exynos850-input_booster.dtsi"
+
+/ {
+	compatible = "samsung,exynos850";
+
+	fragment@common {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			secgpio_dvs {
+				compatible = "samsung,exynos850-secgpio-dvs";
+				status = "okay";
+			};
+
+			fixed-rate-clocks {
+				oscclk {
+					compatible = "samsung,exynos3830-oscclk";
+					clock-frequency = <26000000>;
+				};
+			};
+
+			firmware {
+				android: android {
+					compatible = "android,firmware";
+					vbmeta {
+						compatible = "android,vbmeta";
+						parts = "vbmeta,boot,system,vendor,product,odm,prism,optics,vbmeta_system,recovery,dtbo,keystorage";
+					};
+				};
+			};
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+	fragment@model {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			model = "EXYNOS850";
+		};
+	};
+}; /* end of root */
+
+&chosen {
+	bootargs_ext = "";
+};
+
+&serial_0 {
+	status = "okay";
+#if defined(CONFIG_SEC_FACTORY)
+	samsung,uart-logging;
+#endif
+};
+
+&pinctrl_4 {
+	sd0_cmd: sd0-cmd {
+		samsung,pin-pud = <0>;
+	};
+};

@@ -1,0 +1,628 @@
+/*
+ * SAMSUNG LCD Panel Device Tree Source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * SAMSUNG EXYNOS9630 SoC device nodes are listed in this file.
+ * EXYNOS9630 based board files can include this file and provide
+ * values for board specfic bindings.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "../exynos_gpio_config_macros.dtsi"
+
+/ {
+	fragment@lcd {
+		target-path = "/";
+		__overlay__ {
+			lcd_fixed_regulator: lcd_fixed_regulator {
+				compatible = "simple-bus";
+
+				__gpio_lcd_rst: __gpio_lcd_rst {
+					compatible = "regulator-fixed";
+					regulator-name = "gpio_lcd_rst";
+					gpio = <&gpg2 4 0>;	/* LCD_RST */
+					enable-active-high;
+					regulator-boot-on;
+				};
+				__gpio_lcd_bl_en: __gpio_lcd_bl_en {
+					compatible = "regulator-fixed";
+					regulator-name = "gpio_lcd_bl_en";
+					gpio = <&gpg2 1 0>;	/* LCD_BL_EN */
+					enable-active-high;
+					regulator-boot-on;
+				};
+			};
+
+			decon_board_nt36525b: decon_board_nt36525b {
+				panel_power_enable_boot {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"regulator,enable",		"gpio_lcd_rst",
+					"regulator,enable",		"gpio_lcd_bl_en";
+				};
+
+				panel_power_enable {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"delay,usleep",	"1000",
+					"regulator,enable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"1000";
+				};
+
+				panel_power_disable {
+					type =
+					"delay,usleep",	"3000",
+					"regulator,disable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"5000",
+					"regulator,disable",	"vdd_ldo28",
+					"delay,msleep",	"30";
+				};
+
+				panel_reset {
+					type =
+					"delay,usleep",	"10000",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,usleep",	"1000",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"3500",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,usleep",	"10000";
+				};
+
+				panel_reset_disable {
+					type =
+					"delay,msleep",	"60",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"5000";
+				};
+
+			};
+
+			nt36525b_ctc: nt36525b_ctc {
+				id = <0x0AA240>;
+				decon_board = <&decon_board_nt36525b>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1600>;
+				size = <68 151>;	/* 67.932 *150.96 */
+				timing,refresh = <60>;
+				timing,h-porch = <110 70 28>;
+				timing,v-porch = <252 8 2>;
+				timing,dsi-hs-clk = <830>;	/* <830> - <2, 255, 2, 25206> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1600 60 0 0 0 0 8>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>,	/* 0: Disable, 1: Enable */
+			};
+
+			decon_board_ili9882q_boe: decon_board_ili9882q_boe {
+				panel_power_enable_boot {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"regulator,enable",		"gpio_lcd_rst",
+					"regulator,enable",		"gpio_lcd_bl_en";
+				};
+
+				panel_power_enable {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"delay,usleep",	"1000",
+					"regulator,enable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"1000";
+				};
+
+				panel_power_disable {
+					type =
+					"delay,usleep",	"3000",
+					"regulator,disable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"5000",
+					"regulator,disable",	"vdd_ldo28",
+					"delay,usleep",	"15000";
+				};
+
+				panel_reset {
+					type =
+					"delay,usleep",	"4000",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,usleep",	"1000",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"1000",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,msleep",	"25";
+				};
+
+				panel_reset_disable {
+					type =
+					"delay,msleep",	"90",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"5000";
+				};
+
+			};
+
+			ili9882q_boe: ili9882q_boe {
+				id = <0x3A6250>;
+				decon_board = <&decon_board_ili9882q_boe>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1600>;
+				size = <68 151>;	/* 67.932 *150.96 */
+				timing,refresh = <60>;
+				timing,h-porch = <80 102 24>;
+				timing,v-porch = <18 250 2>;
+				timing,dsi-hs-clk = <830>;	/* <830> - <2, 255, 2, 25206> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1600 60 0 0 0 0 250>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>,	/* 0: Disable, 1: Enable */
+			};
+
+			nt36525b_sharp: nt36525b_sharp {
+				id = <0x0AF240>;
+				decon_board = <&decon_board_nt36525b>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1600>;
+				size = <68 151>;	/* 67.932 *150.96 */
+				timing,refresh = <60>;
+				timing,h-porch = <110 90 2>;
+				timing,v-porch = <254 18 2>;
+				timing,dsi-hs-clk = <830>;	/* <830> - <2, 255, 2, 25206> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1600 60 0 0 0 0 18>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>,	/* 0: Disable, 1: Enable */
+			};
+
+			nt36525b_dtc: nt36525b_dtc {
+				id = <0x0A1240>;
+				decon_board = <&decon_board_nt36525b>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1600>;
+				size = <68 151>;	/* 67.932 *150.96 */
+				timing,refresh = <60>;
+				timing,h-porch = <110 96 2>;
+				timing,v-porch = <248 8 6>;
+				timing,dsi-hs-clk = <830>;	/* <830> - <2, 255, 2, 25206> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1600 60 0 0 0 0 8>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>,	/* 0: Disable, 1: Enable */
+			};
+
+			decon_board_td4150: decon_board_td4150 {
+				panel_power_enable_boot {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"regulator,enable",		"gpio_lcd_rst",
+					"regulator,enable",		"gpio_lcd_bl_en";
+				};
+
+				panel_power_enable {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"delay,usleep",	"1000",
+					"regulator,enable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"1000";
+				};
+
+				panel_power_disable {
+					type =
+					"delay,usleep",	"3000",
+					"regulator,disable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"5000",
+					"regulator,disable",	"vdd_ldo28",
+					"delay,usleep",	"15000";
+				};
+
+				panel_reset {
+					type =
+					"delay,usleep",	"1000",
+					"regulator,enable",		"gpio_lcd_rst",
+					"delay,usleep",	"2000",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"2000",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,msleep",	"20";
+				};
+
+				panel_reset_disable {
+					type =
+					"delay,msleep",	"70",
+					"regulator,disable",		"gpio_lcd_rst",
+					"delay,usleep",	"10000";
+				};
+			};
+
+			td4150_boe: td4150_boe {
+				id = <0x3A6220>;
+				decon_board = <&decon_board_td4150>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1600>;
+				size = <68 151>;	/* 67.932 *150.96 */
+				timing,refresh = <60>;
+				timing,h-porch = <80 102 24>;
+				timing,v-porch = <18 250 2>;
+				timing,dsi-hs-clk = <830>;	/* <830> - <2, 255, 2, 25206> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1600 60 0 0 0 0 250>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>,	/* 0: Disable, 1: Enable */
+			};
+
+			decon_board_ili7807s: decon_board_ili7807s {
+				panel_power_enable_boot {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"regulator,enable",		"gpio_lcd_rst",
+					"regulator,enable",		"gpio_lcd_bl_en";
+				};
+
+				panel_power_enable {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"delay,usleep",	"1000",
+					"regulator,enable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"1000";
+				};
+
+				panel_power_disable {
+					type =
+					"delay,usleep",	"3000",
+					"regulator,disable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"5000",
+					"regulator,disable",	"vdd_ldo28",
+					"delay,usleep",	"15000";
+				};
+
+				panel_reset {
+					type =
+					"delay,usleep",	"1000",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,usleep",	"1000",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"1000",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,msleep",	"55";
+				};
+
+				panel_reset_disable {
+					type =
+					"delay,msleep",	"90",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"10000";
+				};
+			};
+
+			ili7807s: ili7807s {
+				id = <0xBA7254>;
+				decon_board = <&decon_board_ili7807s>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1600>;
+				size = <68 151>;	/* 67.932 *150.96 */
+				timing,refresh = <60>;
+				timing,h-porch = <160 156 12>;
+				timing,v-porch = <6 38 2>;
+				timing,dsi-hs-clk = <830>;	/* <830> - <2, 255, 2, 25206> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1600 60 0 0 0 0 38>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>,	/* 0: Disable, 1: Enable */
+			};
+
+			td4375_boe: td4375_boe {
+				id = <0x7A6220>;
+				decon_board = <&decon_board_td4150>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1600>;
+				size = <68 151>;	/* 67.932 *150.96 */
+				timing,refresh = <60>;
+				timing,h-porch = <80 102 24>;
+				timing,v-porch = <24 48 12>;
+				timing,dsi-hs-clk = <830>;	/* <830> - <2, 255, 2, 25206> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1600 60 0 0 0 0 48>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>,	/* 0: Disable, 1: Enable */
+			};
+
+			td4160_boe: td4160_boe {
+				id = <0xBA6220>;
+				decon_board = <&decon_board_td4150>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1600>;
+				size = <68 151>;	/* 67.932 *150.96 */
+				timing,refresh = <60>;
+
+				timing,h-porch = <100 243 2>;
+				timing,v-porch = <12 150 4>;
+				timing,dsi-hs-clk = <830>;	/* <830> - <2, 255, 2, 25206> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1600 60 0 0 0 0 150>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>,	/* 0: Disable, 1: Enable */
+			};
+
+			reserved-memory {
+				fb_handover: bootloader_fb {
+					compatible = "exynos,fb_handover";
+					reg = <0x0 0xFA000000 0x00D00000>;
+				};
+			};
+		};
+	};
+};
+
+&pinctrl_0 {
+	disp_conn_ctrl:	disp-conn-ctrl {
+		samsung,pins = "gpa1-2";
+		samsung,pin-pud = <0>;
+	};
+};
+
+&i2c1_bus {
+	samsung,pins = "gpp0-2", "gpp0-3";
+	samsung,pin-function = <2>;
+	samsung,pin-pud = <PIN_PULL_UP>;
+	samsung,pin-drv = <0>;
+	samsung,pin-con-pdn = <PIN_PDN_PREV>;
+	samsung,pin-pud-pdn = <PIN_PULL_UP>;
+};
+
+&pinctrl_5 {
+	disp_rst_ctrl:	disp-rst-ctrl {
+		samsung,pins = "gpg2-4";
+		samsung,pin-con-pdn = <PIN_PDN_PREV>;
+		samsung,pin-pud-pdn = <PIN_PULL_NONE>;
+	};
+
+	disp_blen_ctrl:		disp-blen-ctrl {
+		samsung,pins = "gpg2-1";
+		samsung,pin-con-pdn = <PIN_PDN_PREV>;
+		samsung,pin-pud-pdn = <PIN_PULL_NONE>;
+	};
+
+	disp_lcd_id:		disp-lcd-id {
+		samsung,pins = "gpg1-7", "gpg2-0";
+		samsung,pin-con-pdn = <PIN_PDN_INPUT>;
+		samsung,pin-pud-pdn = <PIN_PULL_NONE>;
+	};
+};
+
+&panel_drv_0 {
+    status = "okay";
+	ddi_info = <&nt36525b_ctc>;
+
+	#address-cells = <2>;
+	#size-cells = <1>;
+	ranges;
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&disp_conn_ctrl &disp_rst_ctrl &disp_blen_ctrl &disp_lcd_id>;
+
+	gpios {
+		conn-det {
+			name = "conn-det";
+			gpios = <&gpa1 2 0>;	/* 0:OK, 1:NOK(active) */
+			dir = <1>;				/* IN */
+			irq-type = <0x00002001>;	/* RISING EDGE | ONE_SHOT */
+		};
+#if 0
+		err-fg {
+			name = "err-fg";
+			gpios = <&gpa3 2 1>; 		/* 0:NOK(active) 1:OK */
+			dir = <1>;  				/* IN */
+			irq-type = <0x2>;   /* FALLING EDGE */
+		};
+#endif
+	};
+
+	panel-lookup {
+		panel-id-addr = <0xDA 0xDB 0xDC>;
+		panel-id-len = <0x1 0x1 0x1>;
+		panel-name = "nt36525b_ctc_a12s_default", "ili9882q_boe_a12s_default", "nt36525b_sharp_a12s_default", "nt36525b_dtc_a12s_default", "td4150_boe_a12s_default", "ili7807s_a12s_default", "td4375_boe_a12s_default", "td4160_boe_a12s_default";
+		panel-ddi-info = <&nt36525b_ctc>, <&ili9882q_boe>, <&nt36525b_sharp>, <&nt36525b_dtc>, <&td4150_boe>, <&ili7807s>, <&td4375_boe>, <&td4160_boe>;
+		panel-lut = <
+			0x0AA240 0xFFFFFF 0x0 0x0  /* 1st NT36525B CTC */
+			0x3A6250 0xFFFFFF 0x1 0x1  /* 2nd ILI9882Q BOE*/
+			0x0AF240 0xFFFFFF 0x2 0x2  /* 3rd NT36525B SHARP */
+			0x0A1240 0xFFFFFF 0x3 0x3  /* 4th NT36525B DTC */
+			0x3A6220 0xFFFFFF 0x4 0x4  /* 5th TD4150   BOE */
+			0xBA7254 0xFFFFFF 0x5 0x5  /* 6th ILI7807S TMC */
+			0x7A6220 0xFFFFFF 0x6 0x6  /* 7th TD4375   BOE */
+			0xBA6220 0xFFFFFF 0x7 0x7  /* 8th TD4160   BOE */
+			0x000000 0x000000 0x0 0x0  /* def NT36525B */
+		>;
+	};
+};
+
+&dsim_0 {
+	memory-region = <&fb_handover>;
+};
+
+&decon_f {
+	psr_mode = <0>;		/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+	trig_mode = <0>;	/* 0: hw trigger, 1: sw trigger */
+	dsi_mode = <0>;		/* 0: single dsi, 1: dual dsi */
+};
+
+&i2c_1 {
+	clock-frequency = <400000>;
+	status = "okay";
+
+	lm36274@11 {
+		compatible = "panel_i2c";
+		reg = <0x11>;
+	};
+};
+

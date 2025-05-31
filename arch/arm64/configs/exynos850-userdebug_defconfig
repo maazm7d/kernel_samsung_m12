@@ -1,0 +1,17 @@
+# UH
+# CONFIG_RKP_FIMC_CHECK is not set
+# CONFIG_KDP is not set
+
+CONFIG_IS_DDK_DATA_LOAD=n
+
+CONFIG_SEC_GPIO_DVS=y
+
+# SDP KeyManagement Test for MDFPP evaluation
+CONFIG_SDP_KEY_DUMP=y
+
+CONFIG_DEBUG_FS=y
+
+#
+# DO NOT REMOVE THE LAST BLANK LINE
+#
+

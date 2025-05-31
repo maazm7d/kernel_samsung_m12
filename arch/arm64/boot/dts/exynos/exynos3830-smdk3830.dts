@@ -1,0 +1,101 @@
+/*
+ * SAMSUNG EXYNOS3830 board device tree source
+ *
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+/plugin/;
+#include "exynos3830-board_common.dtsi"
+
+/ {
+	compatible = "samsung,exynos850", "samsung,SMDK850";
+	board_id = <0x0>;
+	board_rev = <0x0>;
+
+	fragment@model {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			model = "Samsung SMDK850 board based on EXYNOS850";
+
+			usb_hs_tune:hs_tune {
+				status = "disabled";
+				hs_tune_cnt = <4>;
+				/* value = <device host> */
+				hs_tune1 {
+					tune_name = "tx_pre_emp";
+					tune_value = <0x3 0x3>;
+				};
+
+				hs_tune2 {
+					tune_name = "tx_vref";
+					tune_value = <0xc 0xc>;
+				};
+
+				hs_tune3 {
+					tune_name = "rx_sqrx";
+					tune_value = <0x5 0x5>;
+				};
+
+				hs_tune4 {
+					tune_name = "utmi_clk";
+					tune_value = <0x1 0x1>;
+				};
+			};
+			usb_notifier {
+				compatible = "samsung,usb-notifier";
+				udc = <&udc>;
+			};
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
+
+&panel_0 {
+    /* reset, power */
+    gpios = <&gpg2 5 0x1>, <&gpg1 1 0x1>;
+};
+
+&udc {
+	status = "okay";
+};
+
+&usbdrd_dwc3 {
+	dr_mode = "otg";
+	maximum-speed = "high-speed";
+	snps,quirk-frame-length-adjustment = <0x20>;
+	snps,u1u2_exitfail_quirk;
+	/* ux_exit_in_px should be defined in MK, LT */
+	snps,ux_exit_in_px_quirk;
+	/* elastic_buf_mode_quirk should be defined in MK */
+	snps,elastic_buf_mode_quirk;
+	/* usb3-lpm-capable;
+	snps,usb3_lpm_capable;
+	adj-sof-accuracy = <1>; */
+	/*
+	 * dis-u2-freeclk-exists-quirk, dis_u2_susphy_quirk are alternative.
+	 * One of them should be selected
+	 */
+	snps,dis-u2-freeclk-exists-quirk;
+	/*snps,dis_u2_susphy_quirk;*/
+
+	usb_audio_offloading = <0>;
+//	abox = <&abox>; /* Temporary block */
+};
+
+&usbdrd_phy0 {
+	status = "okay";
+	usb3phy-isolation= <1>;
+	pinctrl-names = "default";
+//	pinctrl-0 = <&phy_port>;
+//	phy,gpio_phy_port = <&gpg0 4 0x0>;
+//	hs_tune_param = <&usb_hs_tune>;
+//	ss_tune_param = <&usb_ss_tune>;
+};

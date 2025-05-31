@@ -1,0 +1,82 @@
+/*
+ * SAMSUNG EXYNOS2100 Argos Device Tree Source
+ *
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/ {
+	compatible = "samsung,exynos850";
+
+	fragment@common {
+		target-path = "/";
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <1>;
+
+			argos {
+				compatible = "samsung,argos";
+				#address-cells = <1>;
+				/*  The device number should be assigned for each device, e.g. "boot_device@1" and "boot_device@2".
+				 * Duplicated number is not allowed. Please refer the below example.
+				 */
+
+				/* Table Format
+				 * threshold : throughput threshold(Mbps)
+				 * big_min : Cluster1 Core's minimum frequency lock. 0 means not set,
+				 * big_max : Cluster1 Core's maximum frequency lock. 0 means not set,
+				 * lit_min : Cluster0 Core's minimum frequency lock. 0 means not set,
+				 * lit_max : Cluster0 Core's maximum frequency lock. 0 means not set,
+				 * mif : MIF frequency lock. 0 means not set,
+				 * int : INT frequency lock. 0 means not set,
+				 * task_affinity : "enable" - Set task affinity lock.
+				 *	           "disable" - Not set or unlock,
+				 *		   Task affinity should be predefined driver's code.
+				 * irq_affinity : "enable" - Set irq affinity lock.
+				 *                "disable" - Not set or unlock,
+				 *		  IRQ affinity should be predefined driver's code.
+				 * hmp_boot : "enable" - Increase hmp boosting count
+				 *            "disable" - Decrease hmp boosting count
+				 * [CAUTION] big cores and little cores are the same in exynos850.
+				 */
+
+				boot_device@1 {
+					net_boost,label="IPC";
+					net_boost,node="rmnet0 rmnet1 rmnet2 rmnet3 rmnet4 rmnet5 rmnet6 rmnet7 umts_dm0";
+					net_boost,table {
+						level_0 {
+							threshold = <100>;
+							lit_min = <1053000>;
+						};
+						level_1 {
+							threshold = <200>;
+							lit_min = <1300000>;
+							mif = <1014000>;
+						};
+						level_2 {
+							threshold = <300>;
+							big_min = <1300000>;
+							lit_min = <1300000>;
+							mif = <1014000>;
+						};
+					};
+				};
+				boot_device@2 {
+					net_boost,label="WIFI";
+					net_boost,node="wlan0";
+					net_boost,table {
+						level_0 {
+							threshold = <200>;
+							big_min = <1846000>;
+							lit_min = <1846000>;
+						};
+					};
+				};
+			};
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */

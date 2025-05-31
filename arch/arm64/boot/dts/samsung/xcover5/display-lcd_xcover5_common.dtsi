@@ -1,0 +1,228 @@
+ /*
+ * SAMSUNG LCD Panel Device Tree Source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * SAMSUNG EXYNOS9630 SoC device nodes are listed in this file.
+ * EXYNOS9630 based board files can include this file and provide
+ * values for board specfic bindings.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "../exynos_gpio_config_macros.dtsi"
+
+/ {
+	fragment@lcd {
+		target-path = "/";
+		__overlay__ {
+			lcd_fixed_regulator: lcd_fixed_regulator {
+				compatible = "simple-bus";
+
+				__gpio_lcd_rst: __gpio_lcd_rst {
+					compatible = "regulator-fixed";
+					regulator-name = "gpio_lcd_rst";
+					gpio = <&gpg2 4 0>;	/* LCD_RST */
+					enable-active-high;
+					regulator-boot-on;
+				};
+				__gpio_lcd_bl_en: __gpio_lcd_bl_en {
+					compatible = "regulator-fixed";
+					regulator-name = "gpio_lcd_bl_en";
+					gpio = <&gpg2 1 0>;	/* LCD_BL_EN */
+					enable-active-high;
+					regulator-boot-on;
+				};
+			};
+
+			decon_board_nt36525: decon_board_nt36525 {
+				panel_power_enable_boot {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"regulator,enable",		"gpio_lcd_rst",
+					"regulator,enable",		"gpio_lcd_bl_en";
+				};
+
+				panel_power_enable {
+					type =
+					"regulator,enable",		"vdd_ldo28",
+					"delay,usleep",	"1000",
+					"regulator,enable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"1000";
+				};
+
+				panel_power_disable {
+					type =
+					"delay,usleep",	"3000",
+					"regulator,disable",	"gpio_lcd_bl_en",
+					"delay,usleep",	"5000",
+					"regulator,disable",	"vdd_ldo28",
+					"delay,msleep",	"30";
+				};
+
+				panel_reset {
+					type =
+					"delay,usleep",	"10000",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,usleep",	"1000",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"3500",
+					"regulator,enable",	"gpio_lcd_rst",
+					"delay,usleep",	"10000";
+				};
+
+				panel_reset_disable {
+					type =
+					"delay,msleep",	"60",
+					"regulator,disable",	"gpio_lcd_rst",
+					"delay,usleep",	"10000";
+				};
+			};
+
+			nt36525: nt36525 {
+				id = <0x9AA240>;
+				decon_board = <&decon_board_nt36525>;
+
+				mode = <0>;	/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+				resolution = <720 1480>;
+				size = <59 121>;	/* 58.968 * 121.212 */
+				timing,refresh = <60>;
+				timing,h-porch = <130 128 20>;
+				timing,v-porch = <232 18 2>;
+				timing,dsi-hs-clk = <830>;	/* <554> - <2, 341, 3, -5041> */
+				timing,pmsk = <0x02 0xFF 0x2 0x6276
+							0x0 0x0 0x0 0x0	/* MFR MRR SEL_PF ICP */
+							0x0 0x0 0x0 0x0	/* AFC_ENB EXTAFC FEED_EN FSEL */
+							0x0 0x0>;
+				timing,dsi-escape-clk = <20>;
+				type_of_ddi = <0>;		/* 0: Samsung Mobile, 1: MAGNA, 2: Normal(Etc) */
+				dsc_en = <0>;			/* 0: Disable, 1: Enable */
+				dsc_cnt = <0>;			/* used DSC count */
+				dsc_slice_num = <0>;		/* count of dsc slice */
+				dsc_slice_h = <0>;		/* height of dsc slice */
+				data_lane = <3>;		/* number of using data lane */
+				mres_en = <0>;
+				mres_number = <1>;
+				mres_width = <1080>;
+				mres_height = <2340>;
+				mres_dsc_width = <0>;
+				mres_dsc_height = <0>;
+				mres_dsc_en = <0>;
+
+				active_fps =<60>;
+				default_mode = <0>;
+				/* <xres : yres : fps : lp_ref : dsc_en : slice_w : slice_h : vfp> */
+				display_mode = <720 1480 60 0 0 0 0 18>;
+
+				hdr_num = <0>;			/* max: 4 */
+				hdr_type = <2 0 0 0>;		/* 1: DOLBY_VISION, 2: HDR10, 3: HLG */
+				hdr_max_luma = <5400000>;	/* 540 */
+				hdr_max_avg_luma = <1200000>;	/* 120 */
+				hdr_min_luma = <5>;		/* 0.0005 */
+//				noncontinuous_clklane = <0>;	/* 0: Disable, 1: Enable */
+			};
+
+			reserved-memory {
+				fb_handover: bootloader_fb {
+					compatible = "exynos,fb_handover";
+					reg = <0x0 0xFA000000 0x01400000>;
+				};
+			};
+		};
+	};
+};
+
+&pinctrl_0 {
+	disp_conn_ctrl:	disp-conn-ctrl {
+		samsung,pins = "gpa1-2";
+		samsung,pin-pud = <0>;
+	};
+};
+
+&i2c1_bus {
+	samsung,pins = "gpp0-2", "gpp0-3";
+	samsung,pin-function = <2>;
+	samsung,pin-pud = <0>; /* H/W pull up */
+	samsung,pin-drv = <0>;
+	samsung,pin-pud-pdn = <0>;
+};
+
+&pinctrl_5 {
+	disp_rst_ctrl:	disp-rst-ctrl {
+		samsung,pins = "gpg2-4";
+		samsung,pin-con-pdn = <PIN_PDN_PREV>;
+		samsung,pin-pud-pdn = <PIN_PULL_NONE>;
+	};
+
+	disp_blen_ctrl:		disp-blen-ctrl {
+		samsung,pins = "gpg2-1";
+		samsung,pin-con-pdn = <PIN_PDN_PREV>;
+		samsung,pin-pud-pdn = <PIN_PULL_NONE>;
+	};
+};
+
+&panel_drv_0 {
+    status = "okay";
+	ddi_info = <&nt36525>;
+
+	#address-cells = <2>;
+	#size-cells = <1>;
+	ranges;
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&disp_conn_ctrl &disp_rst_ctrl &disp_blen_ctrl>;
+
+	gpios {
+		conn-det {
+			name = "conn-det";
+			gpios = <&gpa1 2 0>;	/* 0:OK, 1:NOK(active) */
+			dir = <1>;				/* IN */
+			irq-type = <0x00002001>;	/* RISING EDGE | ONE_SHOT */
+		};
+
+#if 0
+		err-fg {
+			name = "err-fg";
+			gpios = <&gpa3 2 1>; 		/* 0:NOK(active) 1:OK */
+			dir = <1>;  				/* IN */
+			irq-type = <0x2>;   /* FALLING EDGE */
+		};
+#endif
+	};
+
+	panel-lookup {
+		panel-id-addr = <0xDA 0xDB 0xDC>;
+		panel-id-len = <0x1 0x1 0x1>;
+		panel-name = "nt36525_xcover5_default";
+		panel-ddi-info = <&nt36525>;
+		panel-lut = <
+			0x9AA240 0xFFFFFF 0x0 0x0  /* 1st	NT36525		*/
+			0x000000 0x000000 0x0 0x0  /* def	NT36525		*/
+		>;
+	};
+};
+
+&dsim_0 {
+	memory-region = <&fb_handover>;
+};
+
+&decon_f {
+	psr_mode = <0>;		/* 0: video mode, 1: DP command mode, 2: MIPI command mode */
+	trig_mode = <1>;	/* 0: hw trigger, 1: sw trigger */
+	dsi_mode = <0>;		/* 0: single dsi, 1: dual dsi */
+};
+
+&i2c_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	status = "okay";
+
+	lm36274@11 {
+		compatible = "panel_i2c";
+		reg = <0x11>;
+	};
+};

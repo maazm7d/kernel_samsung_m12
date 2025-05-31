@@ -1,0 +1,498 @@
+/*
+ * Samsung Exynos SoC series Pablo driver
+ *
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include <dt-bindings/camera/exynos_is_dt.h>
+#include <dt-bindings/interrupt-controller/exynos3830.h>
+#include <dt-bindings/clock/exynos3830.h>
+
+#include "../camera/vendor_dt/a12s/is-vendor-sensor-pwr_aau_v12s_r00.h"
+#include "../camera/vendor_dt/a12s/camera_a12s_common_exynos850.dtsi"
+#include "../exynos_gpio_config_macros.dtsi"
+
+/***** reference symbol node *****/
+&exynos_is {
+
+	pinctrl-names = "default","sleep";
+	pinctrl-0 = <&cam_init_state>;
+	pinctrl-1 = <&flash_off_state>;
+
+	vender {
+		rear_sensor_id = <61>; /* GM2 */
+		front_sensor_id = <208>; /* SR846 */
+		rear2_sensor_id = <214>; /* GC02M1 */
+		rear3_sensor_id = <210>; /* GC5035 */
+		rear4_sensor_id = <214>; /* GC02M1 */
+
+		need_i2c_config;
+		use_module_check;
+		//skip_cal_loading;
+		//check_sensor_vendor;
+
+		/* for Factory Test */
+		max_supported_camera = <6>;
+		supported_cameraId = <0 1 23 50 52 54>;
+		/* REAR, FRONT, DUAL_REAR_PORTRAIT_WIDE(Bokeh), REAR_2(UW), REAR_3(SUB), REAR_4(MACRO) */
+
+		max_camera_num = <5>;
+		camera_info0 {                 /* 0 : rear - GM2 */
+			isp = <0>;             /* 0 : INT , 1 : EXT , 2 : SOC */
+			cal_memory = <2>;      /* 0 : N , 1 : FROM , 2 : EEPROM , 3 : OTP  */
+			read_version = <0>;    /* 0 : SYSFS , 1 : CAMON */
+			core_voltage = <0>;    /* 0 : N , 1 : Y  */
+			upgrade = <0>;         /* 0 : N , 1 : SYSFS , 2 : CAMON */
+			fw_write = <0>;        /* 0 : N , 1 : OS, 2 : SD, 3 : ALL */
+			fw_dump = <0>;         /* 0 : N , 1 : Y */
+			companion = <0>;       /* 0 : N , 1 : Y  */
+			ois = <0>;             /* 0 : N , 1 : Y  */
+			valid = <1>;           /* 0 : INVALID, 1 : VALID */
+			dual_open = <0>;       /* 0 : SINGLE_OPEN , 1 : DUAL_OPEN */
+			position = <0>;        /* 0 : Rear, 1:Front, 2:Rear2, 3:Front2, 4:Rear3, 5:Front3, 6:Rear4*/
+		};
+		camera_info1 {                 /* 1 : front1 - SR846 */
+			isp = <0>;             /* 0 : INT , 1 : EXT , 2 : SOC */
+			cal_memory = <3>;      /* 0 : N , 1 : FROM , 2 : EEPROM , 3 : OTP  */
+			read_version = <0>;    /* 0 : SYSFS , 1 : CAMON */
+			core_voltage = <0>;    /* 0 : N , 1 : Y  */
+			upgrade = <0>;         /* 0 : N , 1 : SYSFS , 2 : CAMON */
+			fw_write = <0>;        /* 0 : N , 1 : OS, 2 : SD, 3 : ALL */
+			fw_dump = <0>;         /* 0 : N , 1 : Y */
+			companion = <0>;       /* 0 : N , 1 : Y  */
+			ois = <0>;             /* 0 : N , 1 : Y  */
+			valid = <1>;           /* 0 : INVALID, 1 : VALID */
+			dual_open = <0>;       /* 0 : SINGLE_OPEN , 1 : DUAL_OPEN */
+			position = <1>;        /* 0 : Rear, 1:Front, 2:Rear2, 3:Front2, 4:Rear3, 5:Front3, 6:Rear4*/
+		};
+		camera_info2 {                 /* 2 : rear2 - GC02M1 */
+			isp = <0>;             /* 0 : INT , 1 : EXT , 2 : SOC */
+			cal_memory = <3>;      /* 0 : N , 1 : FROM , 2 : EEPROM , 3 : OTP  */
+			read_version = <0>;    /* 0 : SYSFS , 1 : CAMON */
+			core_voltage = <0>;    /* 0 : N , 1 : Y  */
+			upgrade = <0>;         /* 0 : N , 1 : SYSFS , 2 : CAMON */
+			fw_write = <0>;        /* 0 : N , 1 : OS, 2 : SD, 3 : ALL */
+			fw_dump = <0>;         /* 0 : N , 1 : Y */
+			companion = <0>;       /* 0 : N , 1 : Y  */
+			ois = <0>;             /* 0 : N , 1 : Y  */
+			valid = <1>;           /* 0 : INVALID, 1 : VALID */
+			dual_open = <1>;       /* 0 : SINGLE_OPEN , 1 : DUAL_OPEN */
+			position = <2>;        /* 0 : Rear, 1:Front, 2:Rear2, 3:Front2, 4:Rear3, 5:Front3, 6:Rear4*/
+		};
+		camera_info3 {                 /* 3 : rear3 - GC5035 */
+			isp = <0>;             /* 0 : INT , 1 : EXT , 2 : SOC */
+			cal_memory = <3>;      /* 0 : N , 1 : FROM , 2 : EEPROM , 3 : OTP  */
+			read_version = <0>;    /* 0 : SYSFS , 1 : CAMON */
+			core_voltage = <0>;    /* 0 : N , 1 : Y  */
+			upgrade = <0>;         /* 0 : N , 1 : SYSFS , 2 : CAMON */
+			fw_write = <0>;        /* 0 : N , 1 : OS, 2 : SD, 3 : ALL */
+			fw_dump = <0>;         /* 0 : N , 1 : Y */
+			companion = <0>;       /* 0 : N , 1 : Y  */
+			ois = <0>;             /* 0 : N , 1 : Y  */
+			valid = <1>;           /* 0 : INVALID, 1 : VALID */
+			dual_open = <0>;       /* 0 : SINGLE_OPEN , 1 : DUAL_OPEN */
+			position = <4>;        /* 0 : Rear, 1:Front, 2:Rear2, 3:Front2, 4:Rear3, 5:Front3, 6:Rear4*/
+		};
+		camera_info4 {                 /* 4 : rear4 - GC02M1 */
+			isp = <0>;             /* 0 : INT , 1 : EXT , 2 : SOC */
+			cal_memory = <2>;      /* 0 : N , 1 : FROM , 2 : EEPROM , 3 : OTP  */
+			read_version = <0>;    /* 0 : SYSFS , 1 : CAMON */
+			core_voltage = <0>;    /* 0 : N , 1 : Y  */
+			upgrade = <0>;         /* 0 : N , 1 : SYSFS , 2 : CAMON */
+			fw_write = <0>;        /* 0 : N , 1 : OS, 2 : SD, 3 : ALL */
+			fw_dump = <0>;         /* 0 : N , 1 : Y */
+			companion = <0>;       /* 0 : N , 1 : Y  */
+			ois = <0>;             /* 0 : N , 1 : Y  */
+			valid = <1>;           /* 0 : INVALID, 1 : VALID */
+			dual_open = <0>;       /* 0 : SINGLE_OPEN , 1 : DUAL_OPEN */
+			position = <6>;        /* 0 : Rear, 1:Front, 2:Rear2, 3:Front2, 4:Rear3, 5:Front3, 6:Rear4*/
+		};
+	};
+};
+
+&i2c_5 {
+	/* Overwrite not used I2C_5 pins */
+	/delete-property/ pinctrl-0;
+	pinctrl-0 = <>;
+};
+
+&pinctrl_0 {
+	cam_init_state: cam_init_state {
+			samsung,pins = "gpa3-5", "gpa3-6";
+			samsung,pin-function = <1>;
+			samsung,pin-pud = <0>;
+			samsung,pin-val = <0>;
+	};
+};
+
+&pinctrl_5 {
+	/* FRONT */
+	/* No pull-up resistor, use internal one */
+	hsi2c_0_bus: hsi2c_0-bus {
+		samsung,pins = "gpc1-0", "gpc1-1";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	hsi2c_0_bus_in: hsi2c_0-bus-in {
+		samsung,pins = "gpc1-0", "gpc1-1";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	/* REAR */
+	/* No pull-up resistor, use internal one */
+	hsi2c_1_bus: hsi2c_1-bus {
+		samsung,pins = "gpc1-2", "gpc1-3";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	hsi2c_1_bus_in: hsi2c_1-bus-in {
+		samsung,pins = "gpc1-2", "gpc1-3";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	/* REAR2 */
+	/* No pull-up resistor, use internal one */
+	hsi2c_2_bus: hsi2c_2-bus {
+		samsung,pins = "gpc1-4", "gpc1-5";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	hsi2c_2_bus_in: hsi2c_2-bus-in {
+		samsung,pins = "gpc1-4", "gpc1-5";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	/* rear EEPROM, Actuator */
+	i2c_4_bus: i2c_4-bus {
+		samsung,pins = "gpp1-2", "gpp1-3";
+		samsung,pin-function = <2>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	i2c_4_bus_in: i2c_4-bus-in {
+		samsung,pins = "gpp1-2", "gpp1-3";
+		samsung,pin-function = <3>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+	};
+
+	flash_off_state: flash_off_state {
+		samsung,pins = "gpg2-3";
+		samsung,pin-con-pdn = <PIN_PDN_PREV>;
+		samsung,pin-pud-pdn = <PIN_PULL_NONE>;
+	};
+};
+
+&hsi2c_0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	gpios = <&gpc1 0 0 &gpc1 1 0>;
+	status = "okay";
+	clock-frequency = <400000>;
+	samsung,reset-before-trans;
+
+	pinctrl-names = "default","on_i2c","off_i2c";
+	pinctrl-0 = <&hsi2c_0_bus_in>;
+	pinctrl-1 = <&hsi2c_0_bus>;
+	pinctrl-2 = <&hsi2c_0_bus_in>;
+
+	is-actuator@18 {
+		compatible = "samsung,exynos-is-actuator-fp5529";
+		reg = <0x0C>;
+		id = <0>; /* matching is_sensor id */
+		place = <0>;
+	};
+
+	rear_eeprom@B0 {
+		compatible = "samsung,rear-eeprom-i2c";
+		reg = <0x58>;			/* 7bit-addr */
+	};
+
+	rear_eeprom@A4 {
+		compatible = "samsung,rear4-eeprom-i2c";
+		reg = <0x52>;			/* 7bit-addr */
+	};
+
+	is-sr846@40 {
+		compatible = "samsung,exynos-is-cis-sr846";
+		reg = <0x20>;
+		id = <1>; /* matching sensor id */
+		sensor_f_number = <220>; /* f number 2.2 */
+		setfile = "setB";
+		gpio_reset = SR846_RST;
+		use_sensor_otp;
+		rom_position = <1>;
+		use_initial_ae;
+	};
+
+	is-4ha@5A {
+		compatible = "samsung,exynos-is-cis-4ha";
+		reg = <0x2D>;
+		id = <1>; /* matching sensor id */
+		sensor_f_number = <220>; /* f number 2.2 */
+		setfile = "setB";
+		gpio_reset = S5K4HA_RST;
+		use_sensor_otp;
+		dualized_sensor;
+		rom_position = <1>;
+		use_initial_ae;
+	};
+};
+
+&hsi2c_1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	gpios = <&gpc1 2 0 &gpc1 3 0>;
+	status = "okay";
+	clock-frequency = <1000000>;
+	samsung,reset-before-trans;
+	samsung,fast-plus-mode;
+
+	pinctrl-names = "default","on_i2c","off_i2c";
+	pinctrl-0 = <&hsi2c_1_bus_in>;
+	pinctrl-1 = <&hsi2c_1_bus>;
+	pinctrl-2 = <&hsi2c_1_bus_in>;
+
+
+	is-gm2@5A {
+		compatible = "samsung,exynos-is-cis-gm2";
+		reg = <0x2D>;
+		id = <0>; /* matching sensor id */
+		sensor_f_number = <200>; /* f number 2.0 */
+		setfile = "setB";
+	};
+};
+
+&hsi2c_2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	gpios = <&gpc1 4 0 &gpc1 5 0>;
+	status = "okay";
+	clock-frequency = <400000>;
+	samsung,reset-before-trans;
+
+	pinctrl-names = "default","on_i2c","off_i2c";
+	pinctrl-0 = <&hsi2c_2_bus_in>;
+	pinctrl-1 = <&hsi2c_2_bus>;
+	pinctrl-2 = <&hsi2c_2_bus_in>;
+
+	is-gc02m1@6E {
+		compatible = "samsung,exynos-is-cis-gc02m1";
+		reg = <0x37>;
+		id = <2>; /* matching sensor id */
+		sensor_f_number = <240>; /* f number 2.4 */
+		setfile = "setB";
+		use_sensor_otp;
+		rom_position = <2>;
+	};
+
+	is-gc5035@7E {
+		compatible = "samsung,exynos-is-cis-gc5035";
+		reg = <0x3F>;
+		id = <3>; /* matching sensor id */
+		sensor_f_number = <220>; /* f number 2.2 */
+		setfile = "setB";
+		use_sensor_otp;
+		rom_position = <4>;
+	};
+
+	is-gc02m1-macro@A4 {
+		compatible = "samsung,exynos-is-cis-gc02m1-macro";
+		reg = <0x10>;
+		id = <4>; /* matching sensor id */
+		sensor_f_number = <240>; /* f number 2.4 */
+		setfile = "setB";
+	};
+};
+
+&is_sensor0 {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	scenario = <SENSOR_SCENARIO_NORMAL>;	/* Normal, Vision, OIS etc */
+	id = <0>;
+	csi_ch = <1>;
+	dma_ch = <0 0 0 0>;
+	vc_ch = <0 1 2 3>;
+	flite_ch = <FLITE_ID_NOTHING>;
+	use_ssvc1_internal;
+	is_bns = <0>;
+	csi_mux = <0x21>;	/* IPP_INPUT = (ipp1_in << 4 | ipp0_in) = (CSI_ID_C << 4 | CSI_ID_B) */
+	status = "okay";
+	reg = <0x0 0x14410000 0x1000>, /* MIPI-CSI1 */
+		<0x0 0x144A0000 0x10000>; /* PHY: m0s4s4s2 */
+	reg-names = "csi", "phy";
+	interrupts = <0 INTREQ__CSIS1 IRQ_TYPE_LEVEL_HIGH>, /* MIPI-CSI1 */
+			<0 INTREQ__CSIS_DMA_0 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_0 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_0 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_0 IRQ_TYPE_LEVEL_HIGH>;
+	interrupt-names = "csi",
+			"mode0_VC0", "mode0_VC1", "mode0_VC2", "mode0_VC3";
+	phys = <&mipi_phy_csis1_m0s4s4s2 0>;
+	phy-names = "csis_dphy";
+
+	/* without PAF HW */
+	sensor0_ch_mode0: sensor0-ch-mode0 {
+		reg = <0x14431000 0x100>, /* DMA0 VC0 */
+			<0x14431400 0x100>, /* DMA0 Common */
+			<0x14431100 0x100>, /* DMA0 VC1 */
+			<0x14431400 0x100>, /* DMA0 Common */
+			<0x14431200 0x100>, /* DMA0 VC2 */
+			<0x14431400 0x100>, /* DMA0 Common */
+			<0x14431300 0x100>, /* DMA0 VC3 */
+			<0x14431400 0x100>; /* DMA0 Common */
+	};
+};
+
+&is_sensor1 {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	scenario = <SENSOR_SCENARIO_NORMAL>;    /* Normal, Vision, OIS etc */
+	id = <1>;
+	csi_ch = <0>;
+	dma_ch = <1 1 1 1>;
+	vc_ch = <0 1 2 3>;
+	flite_ch = <FLITE_ID_NOTHING>;
+	is_bns = <0>;
+	csi_mux = <0x1>;	/* IPP_INPUT = (ipp1_in << 4 | ipp0_in) = (CSI_ID_A << 4 | CSI_ID_B) */
+	status = "okay";
+
+	reg = <0x0 0x14400000 0x1000>, /* MIPI-CSI0 */
+		<0x0 0x14490000 0x10000>; /* PHY: m0s4s4s2 */
+	reg-names = "csi", "phy";
+	interrupts = <0 INTREQ__CSIS0 IRQ_TYPE_LEVEL_HIGH>, /*MIPI-CSI0 */
+		<0 INTREQ__CSIS_DMA_1 IRQ_TYPE_LEVEL_HIGH>,
+		<0 INTREQ__CSIS_DMA_1 IRQ_TYPE_LEVEL_HIGH>,
+		<0 INTREQ__CSIS_DMA_1 IRQ_TYPE_LEVEL_HIGH>,
+		<0 INTREQ__CSIS_DMA_1 IRQ_TYPE_LEVEL_HIGH>;
+	interrupt-names = "csi",
+		"mode0_VC0", "mode0_VC1", "mode0_VC2", "mode0_VC3";
+	phys = <&mipi_phy_csis0_m0s4s4s2 0>;
+	phy-names = "csis_dphy";
+
+	/* without PAF HW */
+	sensor1_ch_mode0: sensor1-ch-mode0 {
+		reg = <0x14432000 0x100>, /* DMA1 VC0 */
+			<0x14432400 0x100>, /* DMA1 Common */
+			<0x14432100 0x100>, /* DMA1 VC1 */
+			<0x14432400 0x100>, /* DMA1 Common */
+			<0x14432200 0x100>, /* DMA1 VC2 */
+			<0x14432400 0x100>, /* DMA1 Common */
+			<0x14432300 0x100>, /* DMA1 VC3 */
+			<0x14432400 0x100>; /* DMA1 Common */
+	};
+};
+
+&is_sensor2 {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	scenario = <SENSOR_SCENARIO_NORMAL>;    /* Normal, Vision, OIS etc */
+	id = <2>;
+	csi_ch = <2>;
+	dma_ch = <1 1 1 1>;
+	vc_ch = <0 1 2 3>;
+	flite_ch = <FLITE_ID_NOTHING>;
+	is_bns = <0>;
+	csi_mux = <0x21>;	/* IPP_INPUT = (ipp1_in << 4 | ipp0_in) = (CSI_ID_C << 4 | CSI_ID_B) */
+	status = "okay";
+
+	interrupts = <0 INTREQ__CSIS2 IRQ_TYPE_LEVEL_HIGH>, /* MIPI-CSI1 */
+			<0 INTREQ__CSIS_DMA_1 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_1 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_1 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_1 IRQ_TYPE_LEVEL_HIGH>;
+	interrupt-names = "csi",
+			"mode0_VC0", "mode0_VC1", "mode0_VC2", "mode0_VC3";
+
+	/* without PAF HW */
+	sensor2_ch_mode0: sensor2-ch-mode0 {
+		reg = <0x14432000 0x100>, /* DMA1 VC0 */
+			<0x14432400 0x100>, /* DMA1 Common */
+			<0x14432100 0x100>, /* DMA1 VC1 */
+			<0x14432400 0x100>, /* DMA1 Common */
+			<0x14432200 0x100>, /* DMA1 VC2 */
+			<0x14432400 0x100>, /* DMA1 Common */
+			<0x14432300 0x100>, /* DMA1 VC3 */
+			<0x14432400 0x100>; /* DMA1 Common */
+	};
+};
+
+&is_sensor3 {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	scenario = <SENSOR_SCENARIO_NORMAL>;    /* Normal, Vision, OIS etc */
+	id = <3>;
+	csi_ch = <0>;
+	dma_ch = <0 0 0 0>;
+	vc_ch = <0 1 2 3>;
+	flite_ch = <FLITE_ID_NOTHING>;
+	is_bns = <0>;
+	csi_mux = <0x10>;	/* IPP_INPUT = (ipp1_in << 4 | ipp0_in) = (CSI_ID_B << 4 | CSI_ID_A) */
+	status = "okay";
+};
+
+&is_sensor4 {
+	#address-cells = <1>;
+	#size-cells = <1>;
+	scenario = <SENSOR_SCENARIO_NORMAL>;    /* Normal, Vision, OIS etc */
+	id = <4>;
+	csi_ch = <2>;
+	dma_ch = <0 0 0 0>;
+	vc_ch = <0 1 2 3>;
+	flite_ch = <FLITE_ID_NOTHING>;
+	is_bns = <0>;
+	csi_mux = <0x2>;	/* IPP_INPUT = (ipp1_in << 4 | ipp0_in) = (CSI_ID_A << 4 | CSI_ID_C) */
+	status = "okay";
+
+	interrupts = <0 INTREQ__CSIS2 IRQ_TYPE_LEVEL_HIGH>, /* MIPI-CSI2 */
+			<0 INTREQ__CSIS_DMA_0 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_0 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_0 IRQ_TYPE_LEVEL_HIGH>,
+			<0 INTREQ__CSIS_DMA_0 IRQ_TYPE_LEVEL_HIGH>;
+	interrupt-names = "csi",
+			"mode0_VC0", "mode0_VC1", "mode0_VC2", "mode0_VC3";
+
+	/* without PAF HW */
+	sensor4_ch_mode0: sensor4-ch-mode0 {
+		reg = <0x14431000 0x100>, /* DMA0 VC0 */
+			<0x14431400 0x100>, /* DMA0 Common */
+			<0x14431100 0x100>, /* DMA0 VC1 */
+			<0x14431400 0x100>, /* DMA0 Common */
+			<0x14431200 0x100>, /* DMA0 VC2 */
+			<0x14431400 0x100>, /* DMA0 Common */
+			<0x14431300 0x100>, /* DMA0 VC3 */
+			<0x14431400 0x100>; /* DMA0 Common */
+	};
+};
+
+/* FLASH-LED : leds-sm5714 */
+&i2c_0{
+	sm5714-fled@49 {
+		compatible = "siliconmitus,sm5714-fled";
+		status = "okay";
+		flash-gpio = <&gpg2 2 0>;
+		torch-gpio = <&gpg2 3 0>;
+		flash-brightness = <0xA>; /* 0x0(300mA), 0x1(700mA), 0x2(800mA), 0x3(900mA) ~ 0xF(1500mA) : 50mA Step */
+		preflash-brightness = <0x4>;
+		torch-brightness = <0x4>; /*0x0(50mA) ~ 0x7(225mA) : 25mA Step */
+		torch-brightness-levels = <0 1 2 5 7>;
+		timeout = <0xff>;
+	};
+};

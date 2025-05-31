@@ -1,0 +1,95 @@
+/*
+ * SAMSUNG EXYNOS850 board device tree source
+ *
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ *		http://www.samsung.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+&l27_reg {
+	regulator-name = "VDD_GRIP_3P3";
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+};
+
+/ {
+	fragment@common {
+		target-path = "/";
+		__overlay__ {
+			aliases {
+				i2c17 = "/i2c@17";
+			};
+
+			i2c17: i2c@17 {
+				cell-index = <17>;
+				status = "okay";
+				compatible = "i2c-gpio";
+				gpios = <&gpp1 2 0 /* sda */
+					&gpp1 3 0>; /* scl */
+				i2c-gpio,delay-us = <2>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&grip_i2c>;
+
+				a96t3x6@20 {
+					compatible = "a96t3x6";
+					pinctrl-names = "default";
+					pinctrl-0 = <&grip_int>;
+					reg = <0x20>;
+					status = "okay";
+					interrupt-parent = <&gpa0>;
+					interrupts = <1 0 0>;
+
+					a96t3x6,irq_gpio = <&gpa0 1 0x00>;
+					a96t3x6,dvdd_vreg_name = "VDD_GRIP_3P3";
+					a96t3x6,fw_path = "abov/a96t356_m12s_kor.bin";
+					a96t3x6,firmup_cmd = <0x3b>;
+				};
+
+				a96t3x6_sub@21 {
+					compatible = "a96t3x6_sub";
+					pinctrl-names = "default";
+					pinctrl-0 = <&grip_sub_int>;
+					reg = <0x21>;
+					status = "okay";
+					interrupt-parent = <&gpa4>;
+					interrupts = <1 0 0>;
+
+					a96t3x6,irq_gpio = <&gpa4 1 0x00>;
+					a96t3x6,dvdd_vreg_name = "VDD_GRIP_3P3";
+					a96t3x6,fw_path = "abov/a96t356_m12s_kor_sub.bin";
+					a96t3x6,firmup_cmd = <0x3b>;
+				};
+			};
+		}; /* end of __overlay__ */
+	}; /* end of fragment */
+}; /* end of root */
+
+&pinctrl_5 {
+	grip_i2c: grip-i2c {
+		samsung,pins = "gpp1-2", "gpp1-3";
+		samsung,pin-function = <0>;
+		samsung,pin-pud = <0>;
+		samsung,pin-drv = <0>;
+		samsung,pin-con-pdn = <3>;
+		samsung,pin-pud-pdn = <0>;
+	};
+};
+
+&pinctrl_0 {
+	grip_int: grip-int {
+		samsung,pins = "gpa0-1";
+		samsung,pin-function = <0xf>;
+		samsung,pin-pud = <0>;
+	};
+
+	grip_sub_int: grip-sub-int {
+		samsung,pins = "gpa4-1";
+		samsung,pin-function = <0xf>;
+		samsung,pin-pud = <0>;
+	};
+};
